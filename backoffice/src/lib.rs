@@ -1,13 +1,15 @@
+pub(crate) mod cms;
 pub(crate) mod common;
 pub(crate) mod home;
 pub(crate) mod stack;
 pub(crate) mod user;
 
+use crate::cms::route::{CMS_ROUTE, cms_route};
 use crate::common::embed::{AssetFilesEndPoint, EMBED_PATH};
 use crate::common::locale::build_locale_resources;
 use crate::home::home_route;
 use crate::stack::route::stack::{STACK_ROUTE, stack_route};
-use crate::user::role::user_role_check::must_be_root;
+use crate::user::role::user_role_check::{must_be_root, must_be_user};
 use crate::user::role::visitor_only::visitor_redirect;
 use crate::user::route::login::login_route;
 use crate::user::route::user::{USER_ROUTE, user_route};
@@ -42,6 +44,7 @@ pub async fn boot() -> Result<(), Report<MainError>> {
         .nest(USER_ROUTE, visitor_redirect(user_route()))
         .nest(CSRF_PATH, route_csrf())
         .nest(STACK_ROUTE, visitor_redirect(must_be_root(stack_route())))
+        .nest(CMS_ROUTE, visitor_redirect(must_be_user(cms_route())))
         .nest(
             EMBED_PATH,
             enforce_min_js_on_prod(AssetFilesEndPoint::new()),
