@@ -1,0 +1,3 @@
+[env]
+ENV_PROJECT_NAME = { value = "rusty-cms", force = true}
+ENV_PROJECT_NAME_SHOUT_SNAKE = { value = "RUSTY_CMS", force = true}
