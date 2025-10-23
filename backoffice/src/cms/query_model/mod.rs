@@ -24,7 +24,7 @@ impl<'a> FromRequest<'a> for CreateQuery {
     async fn from_request(req: &'a Request, _body: &mut RequestBody) -> poem::Result<Self> {
         let query = req
             .data::<Self>()
-            .ok_or_else(|| poem::Error::from_status(poem::http::StatusCode::BAD_REQUEST))?;
+            .ok_or_else(|| poem::Error::from_status(StatusCode::BAD_REQUEST))?;
         Ok(query.clone())
     }
 }
@@ -49,7 +49,7 @@ impl<'a> FromRequest<'a> for UpdateFetchQuery {
     async fn from_request(req: &'a Request, _body: &mut RequestBody) -> poem::Result<Self> {
         let query = req
             .data::<Self>()
-            .ok_or_else(|| poem::Error::from_status(poem::http::StatusCode::BAD_REQUEST))?;
+            .ok_or_else(|| poem::Error::from_status(StatusCode::BAD_REQUEST))?;
         Ok(query.clone())
     }
 }
