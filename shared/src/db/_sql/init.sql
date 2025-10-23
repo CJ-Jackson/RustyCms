@@ -43,6 +43,7 @@ create table cms_component
     page_id   integer                           not null,
     kind_uuid text                              not null,
     position  integer                           not null,
+    label     text                              not null,
     raw_data  blob                              not null,
     foreign key (page_id) references cms_page (id) on delete cascade
 );
