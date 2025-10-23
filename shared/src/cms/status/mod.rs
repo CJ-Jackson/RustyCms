@@ -25,6 +25,13 @@ impl TryFrom<&str> for CmsPageStatus {
     }
 }
 
+impl TryFrom<String> for CmsPageStatus {
+    type Error = ();
+    fn try_from(s: String) -> Result<Self, Self::Error> {
+        Self::try_from(s.as_str())
+    }
+}
+
 impl From<&CmsPageStatus> for String {
     fn from(s: &CmsPageStatus) -> Self {
         match s {

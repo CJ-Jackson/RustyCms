@@ -21,7 +21,6 @@ pub struct AddPageModel {
 pub struct CreateComponentModel<T: ComponentDataMarker = Vec<u8>> {
     pub page_id: i64,
     pub kind_uuid: String,
-    pub position: i64,
     pub raw_data: T,
     pub label: String,
 }
@@ -31,6 +30,13 @@ pub struct FetchComponentModel<T: ComponentDataMarker = Vec<u8>> {
     pub label: String,
     pub position: i64,
     pub raw_data: T,
+}
+
+pub struct FetchPageModel {
+    pub id: i64,
+    pub title: String,
+    pub summary: String,
+    pub status: CmsPageStatus,
 }
 
 #[derive(Debug)]
@@ -53,7 +59,6 @@ pub struct ListPageModel {
     pub author: String,
     pub user_id: i64,
     pub title: String,
-    pub summary: String,
     pub added: DateTime<Utc>,
     pub updated: Option<DateTime<Utc>>,
     pub status: CmsPageStatus,
@@ -62,6 +67,7 @@ pub struct ListPageModel {
 #[derive(Debug)]
 pub struct UpdateComponentModel<T: ComponentDataMarker = Vec<u8>> {
     pub id: i64,
+    pub label: String,
     pub raw_data: T,
 }
 

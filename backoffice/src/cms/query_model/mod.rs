@@ -1,7 +1,7 @@
-use error_stack::{Report, ResultExt};
 use poem::http::StatusCode;
 use poem::{FromRequest, Request, RequestBody};
 use serde::{Deserialize, Serialize};
+use shared::cms::CmsComponentInfo;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct CreateQuery {
@@ -16,6 +16,16 @@ impl CreateQuery {
 
     pub fn query_string(&self) -> String {
         serde_qs::to_string(self).expect("failed to serialize query string")
+    }
+}
+
+pub trait CreateQueryExt {
+    fn as_create_query(&self, page_id: u64) -> CreateQuery;
+}
+
+impl CreateQueryExt for CmsComponentInfo {
+    fn as_create_query(&self, page_id: u64) -> CreateQuery {
+        CreateQuery::new(self.kind_uuid.clone(), page_id)
     }
 }
 
