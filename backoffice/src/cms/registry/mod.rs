@@ -2,9 +2,7 @@ use crate::cms::enums::ComponentRequestKind;
 use crate::cms::methods::ComponentMethods;
 use crate::cms::query_model::{CreateQuery, UpdateFetchQuery};
 use crate::cms::route::component::markdown::markdown_registry_item;
-use crate::cms::service::cms_permission_check_service::{
-    CmsPermissionCheckService, CmsPermissionCheckServiceError,
-};
+use crate::cms::service::cms_permission_check_service::CmsPermissionCheckService;
 use poem::http::StatusCode;
 use poem::{Endpoint, FromRequest, IntoEndpoint, Request};
 use shared::cms::CmsComponentInfo;
