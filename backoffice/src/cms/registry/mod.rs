@@ -2,9 +2,14 @@ use crate::cms::enums::ComponentRequestKind;
 use crate::cms::methods::ComponentMethods;
 use crate::cms::query_model::{CreateQuery, UpdateFetchQuery};
 use crate::cms::route::component::markdown::markdown_registry_item;
+use crate::cms::service::cms_permission_check_service::{
+    CmsPermissionCheckService, CmsPermissionCheckServiceError,
+};
 use poem::http::StatusCode;
 use poem::{Endpoint, FromRequest, IntoEndpoint, Request};
 use shared::cms::CmsComponentInfo;
+use shared::context::Dep;
+use shared::error::FromErrorStack;
 use shared::query_string::query::QueryQs;
 use std::collections::HashMap;
 use std::sync::{Arc, OnceLock};
@@ -59,11 +64,16 @@ impl Endpoint for RegistryEndpoint {
     type Output = poem::Response;
 
     async fn call(&self, mut req: Request) -> poem::Result<Self::Output> {
+        let Dep(cmd_permission_check_service) =
+            Dep::<CmsPermissionCheckService>::from_request_without_body(&req).await?;
         match self.request_kind {
             ComponentRequestKind::Create => {
                 let query = QueryQs::<CreateQuery>::from_request_without_body(&req)
                     .await?
                     .0;
+                cmd_permission_check_service
+                    .check_permission_by_page_id(query.page_id as i64)
+                    .map_err(poem::Error::from_error_stack)?;
                 let item = self
                     .registry
                     .0
@@ -77,6 +87,9 @@ impl Endpoint for RegistryEndpoint {
                 let query = QueryQs::<UpdateFetchQuery>::from_request_without_body(&req)
                     .await?
                     .0;
+                cmd_permission_check_service
+                    .check_permission_by_component_id(query.id as i64)
+                    .map_err(poem::Error::from_error_stack)?;
                 let item = self
                     .registry
                     .0
