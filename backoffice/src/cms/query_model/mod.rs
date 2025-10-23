@@ -1,5 +1,8 @@
+use error_stack::{Report, ResultExt};
+use poem::http::StatusCode;
 use poem::{FromRequest, Request, RequestBody};
 use serde::{Deserialize, Serialize};
+use shared::context::{Context, ContextError, FromContext};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct CreateQuery {
@@ -48,5 +51,18 @@ impl<'a> FromRequest<'a> for UpdateFetchQuery {
             .data::<Self>()
             .ok_or_else(|| poem::Error::from_status(poem::http::StatusCode::BAD_REQUEST))?;
         Ok(query.clone())
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct KindUuid(pub String);
+
+impl FromContext for KindUuid {
+    async fn from_context(ctx: &'_ Context<'_>) -> Result<Self, Report<ContextError>> {
+        let req = ctx.req_result()?;
+        let kind_uuid = req
+            .data::<KindUuid>()
+            .ok_or_else(|| Report::new(ContextError::Other))?;
+        Ok(kind_uuid.clone())
     }
 }

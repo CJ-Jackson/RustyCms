@@ -1,6 +1,6 @@
 use crate::cms::enums::ComponentRequestKind;
 use crate::cms::methods::ComponentMethods;
-use crate::cms::query_model::{CreateQuery, UpdateFetchQuery};
+use crate::cms::query_model::{CreateQuery, KindUuid, UpdateFetchQuery};
 use crate::cms::route::component::markdown::markdown_registry_item;
 use poem::http::StatusCode;
 use poem::{Endpoint, FromRequest, IntoEndpoint, Request};
@@ -69,7 +69,8 @@ impl Endpoint for RegistryEndpoint {
                     .0
                     .get(&query.kind_uuid)
                     .ok_or_else(|| poem::Error::from_status(StatusCode::NOT_FOUND))?;
-                req.set_data(query.clone());
+                req.set_data(KindUuid(query.kind_uuid.clone()));
+                req.set_data(query);
                 item.create.call(req).await
             }
             ComponentRequestKind::UpdateFetch => {
@@ -81,7 +82,8 @@ impl Endpoint for RegistryEndpoint {
                     .0
                     .get(&query.kind_uuid)
                     .ok_or_else(|| poem::Error::from_status(StatusCode::NOT_FOUND))?;
-                req.set_data(query.clone());
+                req.set_data(KindUuid(query.kind_uuid.clone()));
+                req.set_data(query);
                 item.update_fetch.call(req).await
             }
         }
