@@ -72,7 +72,7 @@ impl Clone for HtmxHeader {
 
 impl<'a> FromRequest<'a> for HtmxHeader {
     async fn from_request(req: &'a Request, _body: &mut RequestBody) -> poem::Result<Self> {
-        req.get_or_init_cache(|| async { Ok(HtmxHeader(Arc::new(HtmxHeaderData::new(req)))) })
+        req.get_or_init_cache(|| async { Ok(Self(Arc::new(HtmxHeaderData::new(req)))) })
             .await
     }
 }
