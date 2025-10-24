@@ -9,6 +9,7 @@ use rusqlite::{Connection, OptionalExtension, named_params};
 use shared::cms::status::CmsPageStatus;
 use shared::context::{Context, ContextError, FromContext};
 use shared::db::{BorrowConnectionExt, SqliteClient};
+use shared::error::ExtraResultExt;
 use std::sync::{Arc, MutexGuard};
 use thiserror::Error;
 
@@ -50,7 +51,8 @@ impl CmsRepository {
         let mut stmt = conn
             .prepare(include_str!("_sql/cms_repository/add_page.sql"))
             .change_context(CmsRepositoryError::QueryError)
-            .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
 
         let row: ReturningIdModel = stmt
             .query_one(
@@ -62,7 +64,8 @@ impl CmsRepository {
                 |row| Ok(ReturningIdModel(row.get("id")?)),
             )
             .change_context(CmsRepositoryError::RowValueError)
-            .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
 
         Ok(row)
     }
@@ -76,7 +79,8 @@ impl CmsRepository {
         let mut stmt = conn
             .prepare(include_str!("_sql/cms_repository/create_component.sql"))
             .change_context(CmsRepositoryError::QueryError)
-            .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
 
         let row: ReturningIdModel = stmt
             .query_one(
@@ -89,7 +93,8 @@ impl CmsRepository {
                 |row| Ok(ReturningIdModel(row.get("id")?)),
             )
             .change_context(CmsRepositoryError::RowValueError)
-            .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
 
         Ok(row)
     }
@@ -104,7 +109,8 @@ impl CmsRepository {
             },
         )
         .change_context(CmsRepositoryError::QueryError)
-        .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+        .attach(StatusCode::INTERNAL_SERVER_ERROR)
+        .log_it()?;
 
         Ok(())
     }
@@ -118,7 +124,8 @@ impl CmsRepository {
         let mut stmt = conn
             .prepare(include_str!("_sql/cms_repository/fetch_component.sql"))
             .change_context(CmsRepositoryError::QueryError)
-            .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
 
         let row: Option<FetchComponentModel> = stmt
             .query_one(
@@ -135,7 +142,8 @@ impl CmsRepository {
             )
             .optional()
             .change_context(CmsRepositoryError::RowValueError)
-            .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
 
         Ok(row)
     }
@@ -149,7 +157,8 @@ impl CmsRepository {
         let mut stmt = conn
             .prepare(include_str!("_sql/cms_repository/fetch_page.sql"))
             .change_context(CmsRepositoryError::QueryError)
-            .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
 
         let row: Option<FetchPageModel> = stmt
             .query_one(
@@ -168,7 +177,8 @@ impl CmsRepository {
             )
             .optional()
             .change_context(CmsRepositoryError::RowValueError)
-            .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
 
         Ok(row)
     }
@@ -184,7 +194,8 @@ impl CmsRepository {
                 "_sql/cms_repository/get_author_id_component.sql"
             ))
             .change_context(CmsRepositoryError::QueryError)
-            .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
 
         let row: Option<UserIdModel> = stmt
             .query_one(
@@ -195,7 +206,8 @@ impl CmsRepository {
             )
             .optional()
             .change_context(CmsRepositoryError::RowValueError)
-            .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
 
         Ok(row)
     }
@@ -209,7 +221,8 @@ impl CmsRepository {
         let mut stmt = conn
             .prepare(include_str!("_sql/cms_repository/get_author_id_page.sql"))
             .change_context(CmsRepositoryError::QueryError)
-            .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
 
         let row: Option<UserIdModel> = stmt
             .query_one(
@@ -220,7 +233,8 @@ impl CmsRepository {
             )
             .optional()
             .change_context(CmsRepositoryError::RowValueError)
-            .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
 
         Ok(row)
     }
@@ -234,7 +248,8 @@ impl CmsRepository {
         let mut stmt = conn
             .prepare(include_str!("_sql/cms_repository/list_component.sql"))
             .change_context(CmsRepositoryError::QueryError)
-            .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
 
         let rows = stmt
             .query_map(
@@ -251,12 +266,14 @@ impl CmsRepository {
                 },
             )
             .change_context(CmsRepositoryError::RowValueError)
-            .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
 
         let rows = rows
             .collect::<Result<Vec<_>, _>>()
             .change_context(CmsRepositoryError::RowValueError)
-            .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
 
         Ok(rows.into())
     }
@@ -266,7 +283,8 @@ impl CmsRepository {
 
         let mut stmt = conn
             .prepare(include_str!("_sql/cms_repository/list_page.sql"))
-            .change_context(CmsRepositoryError::QueryError)?;
+            .change_context(CmsRepositoryError::QueryError)
+            .log_it()?;
 
         let rows = stmt
             .query_map(named_params! {}, |row| {
@@ -282,12 +300,14 @@ impl CmsRepository {
                 })
             })
             .change_context(CmsRepositoryError::RowValueError)
-            .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
 
         let rows = rows
             .collect::<Result<Vec<_>, _>>()
             .change_context(CmsRepositoryError::RowValueError)
-            .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
 
         Ok(rows.into())
     }
@@ -307,7 +327,8 @@ impl CmsRepository {
             },
         )
         .change_context(CmsRepositoryError::QueryError)
-        .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+        .attach(StatusCode::INTERNAL_SERVER_ERROR)
+        .log_it()?;
 
         Ok(())
     }
@@ -326,7 +347,8 @@ impl CmsRepository {
             },
         )
         .change_context(CmsRepositoryError::QueryError)
-        .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+        .attach(StatusCode::INTERNAL_SERVER_ERROR)
+        .log_it()?;
 
         Ok(())
     }
@@ -347,7 +369,8 @@ impl CmsRepository {
             },
         )
         .change_context(CmsRepositoryError::QueryError)
-        .attach(StatusCode::INTERNAL_SERVER_ERROR)?;
+        .attach(StatusCode::INTERNAL_SERVER_ERROR)
+        .log_it()?;
 
         Ok(())
     }
