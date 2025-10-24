@@ -20,8 +20,6 @@ pub enum CmsRepositoryError {
     RowValueError,
     #[error("Borrow Conn error")]
     BorrowConnError,
-    #[error("Not found error")]
-    NotFoundError,
 }
 
 pub struct CmsRepository {
