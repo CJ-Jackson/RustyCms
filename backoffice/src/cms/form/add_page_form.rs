@@ -55,7 +55,7 @@ impl AddPageForm {
                     (errors.title.into_error_html())
                 }
                 div .form-group {
-                    button type="submit" class="btn btn-primary" { "Add Page" }
+                    button .btn .btn-sky-blue type="submit" class="btn btn-primary" { "Add Page" }
                 }
             }
         }).build()

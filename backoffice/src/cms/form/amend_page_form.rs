@@ -74,7 +74,7 @@ impl AmendPageForm {
                     }
                 }
                 div .form-group {
-                    button type="submit" class="btn btn-primary" { "Amend Page" }
+                    button .btn .btn-sky-blue type="submit" class="btn btn-primary" { "Amend Page" }
                 }
             }
         }
