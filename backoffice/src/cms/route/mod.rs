@@ -58,8 +58,8 @@ async fn cms_list_page(
                             td { (page.status.as_stringed()) }
                             td .action {
                                 @if user_pointer.role == Role::Root || user_pointer.id == page.user_id {
-                                    a .icon href=(format!("/cms/amend-page/{}", page.id)) title="Edit"
-                                        hx-get=(format!("/cms/amend-page/{}", page.id)) hx-target="#main-content" hx-push-url="true" {
+                                    a .icon href=(format!("{}/amend-page/{}", CMS_ROUTE, page.id)) title="Edit"
+                                        hx-get=(format!("{}/amend-page/{}", CMS_ROUTE, page.id)) hx-target="#main-content" hx-push-url="true" {
                                         (edit_icon) }
                                 }
                             }
@@ -68,8 +68,8 @@ async fn cms_list_page(
                 }
             }
             div .text-right .mt-3 {
-                a .inline-block href="/cms/create-page" title="Create"
-                    hx-get="/cms/create-page" hx-target="#main-content" hx-push-url="true" {
+                a .inline-block href=(format!("{}/create-page", CMS_ROUTE)) title="Create"
+                    hx-get=(format!("{}/create-page", CMS_ROUTE)) hx-target="#main-content" hx-push-url="true" {
                     (add_icon) }
             }
         })
