@@ -163,7 +163,7 @@ impl CmsRepository {
         let row: Option<FetchPageModel> = stmt
             .query_one(
                 named_params! {
-                    "id:": id,
+                    ":id": id,
                 },
                 |row| {
                     Ok(FetchPageModel {

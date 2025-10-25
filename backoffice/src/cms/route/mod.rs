@@ -1,14 +1,23 @@
+use crate::cms::form::add_page_form::AddPageForm;
+use crate::cms::form::amend_page_form::AmendPageForm;
 use crate::cms::registry::{registry_ep_create, registry_ep_update_fetch};
 use crate::cms::service::cms_page_service::CmsPageService;
+use crate::cms::service::cms_permission_check_service::CmsPermissionCheckService;
 use crate::common::html::context_html::ContextHtmlBuilder;
 use crate::common::icon::{pencil_square_icon, plus_icon};
 use crate::user::pointer::user_pointer::UserPointer;
 use crate::user::role::Role;
 use maud::{Markup, html};
-use poem::web::Path;
-use poem::{Route, delete, get, handler, patch};
+use poem::http::StatusCode;
+use poem::session::Session;
+use poem::web::{CsrfToken, CsrfVerifier, Path, Redirect};
+use poem::{IntoResponse, Route, delete, get, handler, patch};
 use shared::context::Dep;
-use shared::error::FromErrorStack;
+use shared::csrf::{CsrfTokenHtml, CsrfVerifierError};
+use shared::error::{ExtraResultExt, FromErrorStack};
+use shared::flash::{Flash, FlashMessage};
+use shared::htmx::HtmxHeader;
+use shared::query_string::form::FormQs;
 
 pub mod component;
 
@@ -77,32 +86,141 @@ async fn cms_list_page(
 }
 
 #[handler]
-async fn cms_create_page_get() -> poem::Result<poem::Response> {
+async fn cms_create_page_get(
+    Dep(context_html_builder): Dep<ContextHtmlBuilder>,
+    csrf_token: &CsrfToken,
+) -> poem::Result<Markup> {
+    let add_page_form = AddPageForm::default();
+    Ok(add_page_form
+        .as_form_html(&context_html_builder, None, Some(csrf_token.as_html()))
+        .await)
+}
+
+#[handler]
+async fn cms_create_page_post(
+    Dep(context_html_builder): Dep<ContextHtmlBuilder>,
+    Dep(cms_page_service): Dep<CmsPageService>,
+    FormQs(add_page_form): FormQs<AddPageForm>,
+    csrf_token: &CsrfToken,
+    csrf_verifier: &CsrfVerifier,
+    session: &Session,
+    htmx_header: HtmxHeader,
+) -> poem::Result<poem::Response> {
+    csrf_verifier
+        .verify(add_page_form.csrf_token.as_str())
+        .map_err(poem::Error::from_error_stack)?;
+    let validated_form = add_page_form.as_validated().await.0;
+    let l = &context_html_builder.locale;
+    match validated_form {
+        Ok(validated) => {
+            let returning_id = cms_page_service
+                .add_page(&validated)
+                .log_it()
+                .map_err(poem::Error::from_error_stack)?;
+            session.flash(Flash::Success {
+                msg: format!("Successfully create page {}", returning_id.0),
+            });
+            Ok(htmx_header.do_location(
+                Redirect::see_other(format!("{}/amend-page/{}", CMS_ROUTE, returning_id.0)),
+                "#main-content",
+            ))
+        }
+        Err(error) => {
+            let error_message = error.as_message(l);
+            context_html_builder.attach_form_flash_error();
+            Ok(add_page_form
+                .as_form_html(
+                    &context_html_builder,
+                    Some(error_message),
+                    Some(csrf_token.as_html()),
+                )
+                .await
+                .with_status(StatusCode::UNPROCESSABLE_ENTITY)
+                .into_response())
+        }
+    }
+}
+
+#[handler]
+async fn cms_amend_page_get(
+    Path(page_id): Path<u64>,
+    Dep(context_html_builder): Dep<ContextHtmlBuilder>,
+    Dep(cms_page_service): Dep<CmsPageService>,
+    Dep(cms_permission_check_service): Dep<CmsPermissionCheckService>,
+) -> poem::Result<Markup> {
+    cms_permission_check_service
+        .check_permission_by_page_id(page_id as i64)
+        .map_err(poem::Error::from_error_stack)?;
+
+    let page_model = cms_page_service
+        .fetch_page(page_id as i64)
+        .map_err(poem::Error::from_error_stack)?;
+
+    let mut amend_page_form = AmendPageForm::default();
+    amend_page_form.title = page_model.title.clone();
+    amend_page_form.summary = page_model.summary;
+    amend_page_form.status = page_model.status;
+
+    let title = format!("CMS Page {}", page_model.title);
+
+    Ok(context_html_builder
+        .attach_title(&title)
+        .attach_content(html! {
+            h1 { (title) }
+            (amend_page_form.as_form_html(None).await)
+            div .flex .flex-row .mt-10 {
+                div class="basis-3/4 pr-6" {
+                    h3 { "Positions" }
+                    div #positions {
+                        "Positions"
+                    }
+                    h3 .mt-5 { "Components" }
+                    div #components {
+                        "Components"
+                    }
+                }
+                div class="basis-1/4" {
+                    h3 { "Add Component" }
+                }
+            }
+
+        })
+        .build())
+}
+
+#[handler]
+async fn cms_amend_page_post(
+    Path(page_id): Path<u64>,
+    Dep(cms_page_service): Dep<CmsPageService>,
+    Dep(cms_permission_check_service): Dep<CmsPermissionCheckService>,
+) -> poem::Result<poem::Response> {
+    cms_permission_check_service
+        .check_permission_by_page_id(page_id as i64)
+        .map_err(poem::Error::from_error_stack)?;
     todo!()
 }
 
 #[handler]
-async fn cms_create_page_post() -> poem::Result<poem::Response> {
+async fn cms_update_position(
+    Path(page_id): Path<u64>,
+    Dep(cms_page_service): Dep<CmsPageService>,
+    Dep(cms_permission_check_service): Dep<CmsPermissionCheckService>,
+) -> poem::Result<poem::Response> {
+    cms_permission_check_service
+        .check_permission_by_page_id(page_id as i64)
+        .map_err(poem::Error::from_error_stack)?;
     todo!()
 }
 
 #[handler]
-async fn cms_amend_page_get(Path(page_id): Path<u64>) -> poem::Result<poem::Response> {
-    todo!()
-}
-
-#[handler]
-async fn cms_amend_page_post(Path(page_id): Path<u64>) -> poem::Result<poem::Response> {
-    todo!()
-}
-
-#[handler]
-async fn cms_update_position(Path(page_id): Path<u64>) -> poem::Result<poem::Response> {
-    todo!()
-}
-
-#[handler]
-async fn cms_delete_component(Path(component_id): Path<u64>) -> poem::Result<poem::Response> {
+async fn cms_delete_component(
+    Path(component_id): Path<u64>,
+    Dep(cms_page_service): Dep<CmsPageService>,
+    Dep(cms_permission_check_service): Dep<CmsPermissionCheckService>,
+) -> poem::Result<poem::Response> {
+    cms_permission_check_service
+        .check_permission_by_component_id(component_id as i64)
+        .map_err(poem::Error::from_error_stack)?;
     todo!()
 }
 

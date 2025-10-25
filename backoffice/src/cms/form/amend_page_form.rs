@@ -43,38 +43,32 @@ impl AmendPageForm {
         )
     }
 
-    pub async fn as_form_html(
-        &self,
-        errors: Option<AmendPageFormMessage>,
-        token: Option<Markup>,
-    ) -> Markup {
+    pub async fn as_form_html(&self, errors: Option<AmendPageFormMessage>) -> Markup {
         let errors = errors.unwrap_or_default();
-        let token = token.unwrap_or_default();
 
         html! {
             form .form hx-boost="true" hx-target="this" method="post" hx-swap="outerHTML" {
-                (token)
                 div .form-group {
                     label .label for="amend-title" { "Title" }
-                    input .form-item .w-full type="text" #amend-title name="title" class="form-control" value=(self.title) required
+                    input .form-item .w-full type="text" #amend-title name="title" value=(self.title) required
                         placeholder="Title" {}
                     (errors.title.into_error_html())
                 }
                 div .form-group {
                     label .label for="amend-summary" { "Summary" }
-                    textarea .form-item .w-full #amend-summary name="summary" class="form-control" required {
+                    textarea .form-item .w-full #amend-summary name="summary" required {
                         (self.summary)
                     }
                     (errors.summary.into_error_html())
                 }
                 div .form-group {
                     label .label for="amend-status" { "Status" }
-                    select .form-item .w-full #amend-status name="status" class="form-control" required {
+                    select .form-item .w-full #amend-status name="status" required {
                         (self.status.html_option())
                     }
                 }
                 div .form-group {
-                    button .btn .btn-sky-blue type="submit" class="btn btn-primary" { "Amend Page" }
+                    button .btn .btn-sky-blue type="submit" { "Save Info and Status" }
                 }
             }
         }
