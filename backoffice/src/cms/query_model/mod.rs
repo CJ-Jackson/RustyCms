@@ -1,3 +1,4 @@
+use crate::cms::route::CMS_ROUTE;
 use poem::http::StatusCode;
 use poem::{FromRequest, Request, RequestBody};
 use serde::{Deserialize, Serialize};
@@ -16,6 +17,10 @@ impl CreateQuery {
 
     pub fn query_string(&self) -> String {
         serde_qs::to_string(self).expect("failed to serialize query string")
+    }
+
+    pub fn as_uri(&self) -> String {
+        format!("{}/create-component?{}", CMS_ROUTE, self.query_string())
     }
 }
 
@@ -51,6 +56,10 @@ impl UpdateFetchQuery {
 
     pub fn query_string(&self) -> String {
         serde_qs::to_string(self).expect("failed to serialize query string")
+    }
+
+    pub fn as_uri(&self) -> String {
+        format!("{}/component?{}", CMS_ROUTE, self.query_string())
     }
 }
 
