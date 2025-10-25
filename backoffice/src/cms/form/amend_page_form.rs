@@ -36,7 +36,7 @@ impl AmendPageForm {
                 Ok(AmendPageFormValidated {
                     title: title.expect("title is not empty"),
                     summary: summary.expect("summary is not empty"),
-                    status: self.status.clone(),
+                    status: self.status,
                 })
             }
             .await,

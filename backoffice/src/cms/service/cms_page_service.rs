@@ -73,7 +73,7 @@ impl CmsPageService {
                 id: page_id,
                 title: amend_page_form.title.as_str().to_string(),
                 summary: amend_page_form.summary.as_str().to_string(),
-                status: amend_page_form.status.clone(),
+                status: amend_page_form.status,
             })
             .change_context(CmsPageServiceError::DbError)
     }

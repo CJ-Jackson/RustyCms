@@ -2,7 +2,7 @@ use maud::{Markup, html};
 use serde::de::Visitor;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum CmsPageStatus {
     Draft,
     Published,
