@@ -50,12 +50,12 @@ impl AddPageForm {
                 (token)
                 div .form-group {
                     label .label for="add-title" { "Title" }
-                    input .form-item .w-full type="text" #add-title name="title" class="form-control" value=(self.title) required
+                    input .form-item .w-full type="text" #add-title name="title" value=(self.title) required
                         placeholder="Title" {}
                     (errors.title.into_error_html())
                 }
                 div .form-group {
-                    button .btn .btn-sky-blue type="submit" class="btn btn-primary" { "Add Page" }
+                    button .btn .btn-sky-blue type="submit" { "Add Page" }
                 }
             }
         }).build()

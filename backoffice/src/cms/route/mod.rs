@@ -1,14 +1,18 @@
 use crate::cms::form::add_page_form::AddPageForm;
 use crate::cms::form::amend_page_form::AmendPageForm;
+use crate::cms::form::component_position_form::ComponentPositionForm;
+use crate::cms::html_partial::positions_partial;
 use crate::cms::registry::{registry_ep_create, registry_ep_update_fetch};
 use crate::cms::service::cms_page_service::CmsPageService;
 use crate::cms::service::cms_permission_check_service::CmsPermissionCheckService;
 use crate::common::html::context_html::ContextHtmlBuilder;
+use crate::common::html::flash_partial::flash_partial;
 use crate::common::icon::{pencil_square_icon, plus_icon};
 use crate::user::pointer::user_pointer::UserPointer;
 use crate::user::role::Role;
 use maud::{Markup, html};
 use poem::http::StatusCode;
+use poem::i18n::Locale;
 use poem::session::Session;
 use poem::web::{CsrfToken, CsrfVerifier, Path, Redirect};
 use poem::{IntoResponse, Route, delete, get, handler, patch};
@@ -18,6 +22,7 @@ use shared::error::{ExtraResultExt, FromErrorStack};
 use shared::flash::{Flash, FlashMessage};
 use shared::htmx::HtmxHeader;
 use shared::query_string::form::FormQs;
+use std::sync::Arc;
 
 pub mod component;
 
@@ -163,6 +168,10 @@ async fn cms_amend_page_get(
 
     let title = format!("CMS Page {}", page_model.title);
 
+    let list_component_model = cms_page_service
+        .list_component(page_id as i64)
+        .map_err(poem::Error::from_error_stack)?;
+
     Ok(context_html_builder
         .attach_title(&title)
         .attach_content(html! {
@@ -170,14 +179,12 @@ async fn cms_amend_page_get(
             (amend_page_form.as_form_html(None).await)
             div .flex .flex-row .mt-10 {
                 div class="basis-3/4 pr-6" {
-                    h3 { "Positions" }
-                    div #positions {
-                        "Positions"
-                    }
-                    h3 .mt-5 { "Components" }
+                    h3 { "Components" }
                     div #components {
                         "Components"
                     }
+                    h3 .mt-5 { "Positions" }
+                    (positions_partial(None, Arc::clone(&list_component_model), page_id))
                 }
                 div class="basis-1/4" {
                     h3 { "Add Component" }
@@ -193,11 +200,36 @@ async fn cms_amend_page_post(
     Path(page_id): Path<u64>,
     Dep(cms_page_service): Dep<CmsPageService>,
     Dep(cms_permission_check_service): Dep<CmsPermissionCheckService>,
-) -> poem::Result<poem::Response> {
+    FormQs(amend_page_form): FormQs<AmendPageForm>,
+    locale: Locale,
+) -> poem::Result<Markup> {
     cms_permission_check_service
         .check_permission_by_page_id(page_id as i64)
         .map_err(poem::Error::from_error_stack)?;
-    todo!()
+
+    let validated_form = amend_page_form.as_validated().await.0;
+    match validated_form {
+        Ok(validated) => {
+            cms_page_service
+                .update_page(page_id as i64, &validated)
+                .map_err(poem::Error::from_error_stack)?;
+            Ok(html! {
+                (amend_page_form.as_form_html(None).await)
+                (flash_partial(Flash::Success {
+                    msg: "Updated Info and Status".to_string()
+                }))
+            })
+        }
+        Err(error) => {
+            let error_message = error.as_message(&locale);
+            Ok(html! {
+                (amend_page_form.as_form_html(Some(error_message)).await)
+                (flash_partial(Flash::Error {
+                    msg: "Failed to update info and status".to_string()
+                }))
+            })
+        }
+    }
 }
 
 #[handler]
@@ -205,11 +237,26 @@ async fn cms_update_position(
     Path(page_id): Path<u64>,
     Dep(cms_page_service): Dep<CmsPageService>,
     Dep(cms_permission_check_service): Dep<CmsPermissionCheckService>,
-) -> poem::Result<poem::Response> {
+    FormQs(component_position_form): FormQs<ComponentPositionForm>,
+) -> poem::Result<Markup> {
     cms_permission_check_service
         .check_permission_by_page_id(page_id as i64)
         .map_err(poem::Error::from_error_stack)?;
-    todo!()
+
+    cms_page_service
+        .update_component_position(&component_position_form)
+        .map_err(poem::Error::from_error_stack)?;
+
+    let list_component_model = cms_page_service
+        .list_component(page_id as i64)
+        .map_err(poem::Error::from_error_stack)?;
+
+    Ok(html! {
+        (positions_partial(Some("true".to_string()), Arc::clone(&list_component_model), page_id))
+        (flash_partial(Flash::Success {
+            msg: "Updated Positions".to_string()
+        }))
+    })
 }
 
 #[handler]

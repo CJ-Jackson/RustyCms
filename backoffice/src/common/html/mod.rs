@@ -1,4 +1,5 @@
 pub mod context_html;
+pub mod flash_partial;
 pub mod locale;
 pub mod validate;
 

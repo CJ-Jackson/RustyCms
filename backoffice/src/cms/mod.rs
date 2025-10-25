@@ -1,6 +1,7 @@
 pub mod data_model;
 pub mod enums;
 pub mod form;
+pub mod html_partial;
 pub mod methods;
 pub mod query_model;
 pub mod registry;
