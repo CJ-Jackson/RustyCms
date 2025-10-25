@@ -221,6 +221,9 @@
   .mt-10 {
     margin-top: calc(var(--spacing) * 10);
   }
+  .mb-3 {
+    margin-bottom: calc(var(--spacing) * 3);
+  }
   .btn {
     display: flex;
     align-items: center;
@@ -262,11 +265,11 @@
   .shrink {
     flex-shrink: 1;
   }
-  .basis-1\/4 {
-    flex-basis: calc(1/4 * 100%);
+  .basis-1\/5 {
+    flex-basis: calc(1/5 * 100%);
   }
-  .basis-3\/4 {
-    flex-basis: calc(3/4 * 100%);
+  .basis-4\/5 {
+    flex-basis: calc(4/5 * 100%);
   }
   .resize {
     resize: both;

@@ -47,22 +47,20 @@ impl MarkdownForm {
         let errors = errors.unwrap_or_default();
 
         html! {
-            form .form hx-patch=(query.as_uri()) hx-target="this" hx-swap="outerHTML" {
+            form .mt-3 .mb-3 .form hx-patch=(query.as_uri()) hx-target="this" hx-swap="outerHTML" hx-trigger="change" {
+                h4 { "Markdown" }
                 div .form-group {
-                    label .label { "Title" }
-                    input .form-item .w-full type="text" name="title" value=(self.label) required
-                        placeholder="Title" {}
+                    label .label { "Label" }
+                    input .form-item .w-full type="text" name="label" value=(self.label) required
+                        placeholder="Label" {}
                     (errors.label.into_error_html())
                 }
                 div .form-group {
                     label .label  { "Markdown" }
-                    textarea .form-item .w-full name="Markdown" required {
+                    textarea .form-item .w-full name="markdown" required {
                         (self.markdown)
                     }
                     (errors.markdown.into_error_html())
-                }
-                div .form-group {
-                    button .btn .btn-sky-blue type="submit" { "Save" }
                 }
             }
         }

@@ -72,11 +72,10 @@ impl MarkdownComponentService {
                     .attach(poem::http::StatusCode::NOT_FOUND)
             })?;
 
-        let markdown_component: MarkdownComponent = component_data.raw_data.into();
         Ok(FetchComponentModel {
             label: component_data.label,
             position: component_data.position,
-            raw_data: markdown_component,
+            raw_data: component_data.raw_data.into(),
         })
     }
 

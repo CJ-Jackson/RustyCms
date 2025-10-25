@@ -1,1 +1,1 @@
-mod markdown_component_service;
+pub mod markdown_component_service;

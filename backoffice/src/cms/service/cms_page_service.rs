@@ -42,7 +42,6 @@ impl CmsPageService {
             .add_page(AddPageModel {
                 user_id: self.user_pointer.id,
                 title: add_page_form.title.as_str().to_string(),
-                summary: "".to_string(),
                 status: Default::default(),
             })
             .change_context(CmsPageServiceError::DbError)
@@ -82,7 +81,7 @@ impl CmsPageService {
         &self,
         component_position_form: &ComponentPositionForm,
     ) -> Result<(), Report<CmsPageServiceError>> {
-        for (component_id, position) in component_position_form.position.iter() {
+        for (component_id, position) in component_position_form.mapping.iter() {
             self.cms_repository
                 .update_component_position(UpdateComponentPositionModel {
                     id: *component_id as i64,

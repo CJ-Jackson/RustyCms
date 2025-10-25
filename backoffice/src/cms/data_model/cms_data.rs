@@ -13,7 +13,6 @@ pub struct UserIdModel(pub i64);
 pub struct AddPageModel {
     pub user_id: i64,
     pub title: String,
-    pub summary: String,
     pub status: CmsPageStatus,
 }
 
@@ -33,6 +32,7 @@ pub struct FetchComponentModel<T: ComponentDataMarker = Vec<u8>> {
 }
 
 pub struct FetchPageModel {
+    #[allow(dead_code)]
     pub id: i64,
     pub title: String,
     pub summary: String,

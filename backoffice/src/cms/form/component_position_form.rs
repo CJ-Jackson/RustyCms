@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use std::collections::HashMap;
 
-#[derive(Deserialize, Default)]
+#[derive(Debug, Deserialize, Default)]
 pub struct ComponentPositionForm {
-    pub position: HashMap<u64, u64>,
+    pub mapping: HashMap<u64, u64>,
 }

@@ -1,8 +1,9 @@
 use crate::cms::form::add_page_form::AddPageForm;
 use crate::cms::form::amend_page_form::AmendPageForm;
 use crate::cms::form::component_position_form::ComponentPositionForm;
-use crate::cms::html_partial::positions_partial;
-use crate::cms::registry::{registry_ep_create, registry_ep_update_fetch};
+use crate::cms::html_partial::{component_partial, positions_partial};
+use crate::cms::query_model::CreateQueryExt;
+use crate::cms::registry::{registry_ep_create, registry_ep_update_fetch, registry_item};
 use crate::cms::service::cms_page_service::CmsPageService;
 use crate::cms::service::cms_permission_check_service::CmsPermissionCheckService;
 use crate::common::html::context_html::ContextHtmlBuilder;
@@ -16,12 +17,14 @@ use poem::i18n::Locale;
 use poem::session::Session;
 use poem::web::{CsrfToken, CsrfVerifier, Path, Redirect};
 use poem::{IntoResponse, Route, delete, get, handler, patch};
+use serde_qs::Config;
 use shared::context::Dep;
 use shared::csrf::{CsrfTokenHtml, CsrfVerifierError};
 use shared::error::{ExtraResultExt, FromErrorStack};
 use shared::flash::{Flash, FlashMessage};
 use shared::htmx::HtmxHeader;
 use shared::query_string::form::FormQs;
+use shared::query_string::serde_qs_config::with_serde_qs_config;
 use std::sync::Arc;
 
 pub mod component;
@@ -178,16 +181,19 @@ async fn cms_amend_page_get(
             h1 { (title) }
             (amend_page_form.as_form_html(None).await)
             div .flex .flex-row .mt-10 {
-                div class="basis-3/4 pr-6" {
+                div class="basis-4/5 pr-6" {
                     h3 { "Components" }
-                    div #components {
-                        "Components"
-                    }
+                    span { "All components are auto-save" }
+                    (component_partial(None, Arc::clone(&list_component_model)))
                     h3 .mt-5 { "Positions" }
                     (positions_partial(None, Arc::clone(&list_component_model), page_id))
                 }
-                div class="basis-1/4" {
+                div class="basis-1/5" {
                     h3 { "Add Component" }
+                    @for item in registry_item().iter() {
+                        span .btn .btn-sky-blue hx-get=(item.as_create_query(page_id).as_uri())
+                        hx-target="#components" hx-swap="beforeend" { (item.kind) }
+                    }
                 }
             }
 
@@ -253,6 +259,7 @@ async fn cms_update_position(
 
     Ok(html! {
         (positions_partial(Some("true".to_string()), Arc::clone(&list_component_model), page_id))
+        (component_partial(Some("true".to_string()), Arc::clone(&list_component_model)))
         (flash_partial(Flash::Success {
             msg: "Updated Positions".to_string()
         }))
@@ -282,7 +289,13 @@ pub fn cms_route() -> Route {
             "/amend-page/:page_id",
             get(cms_amend_page_get).post(cms_amend_page_post),
         )
-        .at("/update-position/:page_id", patch(cms_update_position))
+        .at(
+            "/update-position/:page_id",
+            patch(with_serde_qs_config(
+                Config::default().use_form_encoding(true),
+                cms_update_position,
+            )),
+        )
         .at("/create-component", registry_ep_create())
         .at("/component", registry_ep_update_fetch())
         .at(
