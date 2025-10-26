@@ -191,7 +191,7 @@ impl ContextHtmlBuilder {
 
                 if self.htmx_header.request {
                     return html! {
-                        title { (title) " | App" }
+                        title { (title) " | Rusty CMS" }
                         (content)
                         div #alert hx-swap-oob="true" {
                             (flash.flash_message_html())
@@ -237,7 +237,7 @@ impl ContextHtmlBuilder {
         html! {
             nav .nav-content {
                 div .nav-home {
-                    a href="/" hx-push-url="true" hx-target="#main-content" hx-get="/" { "App" }
+                    a href="/" hx-push-url="true" hx-target="#main-content" hx-get="/" { "Rusty CMS" }
                 }
                 div .navigation {
                     (self.parse_navigation(tag))

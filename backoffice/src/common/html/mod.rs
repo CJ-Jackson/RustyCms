@@ -34,7 +34,7 @@ fn html_doc(title: &str, content: Markup, head: Markup, footer: Markup) -> Marku
             head {
                 meta charset="utf-8";
                 meta name="viewport" content="width=device-width, initial-scale=1";
-                title { (title) " | App" }
+                title { (title) " | Rusty Cms" }
                 link rel="stylesheet" type="text/css" href=(main_css_name());
                 (html_import_map())
                 (head)
