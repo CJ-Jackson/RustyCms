@@ -15,11 +15,11 @@ use maud::{Markup, html};
 use poem::http::StatusCode;
 use poem::i18n::Locale;
 use poem::session::Session;
-use poem::web::{CsrfToken, CsrfVerifier, Path, Redirect};
+use poem::web::{Path, Redirect};
 use poem::{IntoResponse, Route, delete, get, handler, patch};
 use serde_qs::Config;
 use shared::context::Dep;
-use shared::csrf::{CsrfTokenHtml, CsrfVerifierError};
+use shared::csrf::csrf_header_check;
 use shared::error::{ExtraResultExt, FromErrorStack};
 use shared::flash::{Flash, FlashMessage};
 use shared::htmx::HtmxHeader;
@@ -96,11 +96,10 @@ async fn cms_list_page(
 #[handler]
 async fn cms_create_page_get(
     Dep(context_html_builder): Dep<ContextHtmlBuilder>,
-    csrf_token: &CsrfToken,
 ) -> poem::Result<Markup> {
     let add_page_form = AddPageForm::default();
     Ok(add_page_form
-        .as_form_html(&context_html_builder, None, Some(csrf_token.as_html()))
+        .as_form_html(&context_html_builder, None)
         .await)
 }
 
@@ -109,14 +108,9 @@ async fn cms_create_page_post(
     Dep(context_html_builder): Dep<ContextHtmlBuilder>,
     Dep(cms_page_service): Dep<CmsPageService>,
     FormQs(add_page_form): FormQs<AddPageForm>,
-    csrf_token: &CsrfToken,
-    csrf_verifier: &CsrfVerifier,
     session: &Session,
     htmx_header: HtmxHeader,
 ) -> poem::Result<poem::Response> {
-    csrf_verifier
-        .verify(add_page_form.csrf_token.as_str())
-        .map_err(poem::Error::from_error_stack)?;
     let validated_form = add_page_form.as_validated().await.0;
     let l = &context_html_builder.locale;
     match validated_form {
@@ -137,11 +131,7 @@ async fn cms_create_page_post(
             let error_message = error.as_message(l);
             context_html_builder.attach_form_flash_error();
             Ok(add_page_form
-                .as_form_html(
-                    &context_html_builder,
-                    Some(error_message),
-                    Some(csrf_token.as_html()),
-                )
+                .as_form_html(&context_html_builder, Some(error_message))
                 .await
                 .with_status(StatusCode::UNPROCESSABLE_ENTITY)
                 .into_response())
@@ -300,23 +290,23 @@ pub fn cms_route() -> Route {
         .at("/list-page", get(cms_list_page))
         .at(
             "/create-page",
-            get(cms_create_page_get).post(cms_create_page_post),
+            get(cms_create_page_get).post(csrf_header_check(cms_create_page_post)),
         )
         .at(
             "/amend-page/:page_id",
-            get(cms_amend_page_get).post(cms_amend_page_post),
+            get(cms_amend_page_get).post(csrf_header_check(cms_amend_page_post)),
         )
         .at(
             "/update-position/:page_id",
             patch(with_serde_qs_config(
                 Config::default().use_form_encoding(true),
-                cms_update_position,
+                csrf_header_check(cms_update_position),
             )),
         )
         .at("/create-component", registry_ep_create())
         .at("/component", registry_ep_update_fetch())
         .at(
             "/delete-component/:component_id/:page_id",
-            delete(cms_delete_component),
+            delete(csrf_header_check(cms_delete_component)),
         )
 }

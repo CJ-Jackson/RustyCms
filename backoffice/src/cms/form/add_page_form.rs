@@ -12,7 +12,6 @@ use std::sync::Arc;
 #[derive(Deserialize, Default)]
 pub struct AddPageForm {
     pub title: String,
-    pub csrf_token: String,
 }
 
 impl AddPageForm {
@@ -39,15 +38,12 @@ impl AddPageForm {
         &self,
         context_html_builder: &ContextHtmlBuilder,
         errors: Option<AddPageFormMessage>,
-        token: Option<Markup>,
     ) -> Markup {
         let errors = errors.unwrap_or_default();
-        let token = token.unwrap_or_default();
 
         context_html_builder.attach_title("Add Page").attach_content(html! {
             h1 .mt-3 { "Add Page" }
             form hx-boost="true" hx-target="#main-content" .form method="post" {
-                (token)
                 div .form-group {
                     label .label for="add-title" { "Title" }
                     input .form-item .w-full type="text" #add-title name="title" value=(self.title) required

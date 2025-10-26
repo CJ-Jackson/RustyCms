@@ -11,6 +11,7 @@ use poem::{IntoResponse, get, handler};
 use shared::cms::components::markdown::MarkdownComponent;
 use shared::cms::markers::ComponentInfoMarker;
 use shared::context::Dep;
+use shared::csrf::csrf_header_check;
 use shared::error::FromErrorStack;
 use shared::query_string::form::FormQs;
 use std::sync::Arc;
@@ -93,6 +94,7 @@ pub fn markdown_registry_item() -> ComponentMethods {
     ComponentMethods {
         info: MarkdownComponent::component_info(),
         create: get(markdown_component_create),
-        update_fetch: get(markdown_component_fetch).patch(markdown_component_update),
+        update_fetch: get(markdown_component_fetch)
+            .patch(csrf_header_check(markdown_component_update)),
     }
 }

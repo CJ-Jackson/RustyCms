@@ -18,6 +18,7 @@
     --spacing: 0.25rem;
     --text-sm: 0.875rem;
     --text-sm--line-height: calc(1.25 / 0.875);
+    --text-base: 1rem;
     --text-lg: 1.125rem;
     --text-lg--line-height: calc(1.75 / 1.125);
     --text-xl: 1.25rem;
@@ -333,6 +334,12 @@
   h4 {
     font-size: var(--text-lg);
     font-weight: var(--font-weight-semibold);
+  }
+  h5 {
+    font-size: var(--text-base);
+  }
+  h6 {
+    font-size: var(--text-sm);
   }
   .ul-bullet {
     list-style: disc;

@@ -21,6 +21,14 @@
         font-weight: var(--font-weight-semibold);
     }
 
+    h5 {
+        font-size: var(--text-base);
+    }
+
+    h6 {
+        font-size: var(--text-sm);
+    }
+
     .ul-bullet {
         list-style: disc;
     }
