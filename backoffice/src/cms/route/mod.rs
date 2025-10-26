@@ -196,7 +196,6 @@ async fn cms_amend_page_get(
                     }
                 }
             }
-
         })
         .build())
 }
