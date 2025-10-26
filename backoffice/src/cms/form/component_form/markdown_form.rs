@@ -58,7 +58,7 @@ impl MarkdownForm {
                         hx-swap="outerHTML"
                         hx-target=(format!("#label-group-{}", query.id))
                         hx-select=(format!("#label-group-{}", query.id))
-                         {}
+                        {}
                     (errors.label.into_error_html())
                 }
                 div .form-group id=(format!("markdown-group-{}", query.id)) {
