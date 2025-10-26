@@ -291,7 +291,7 @@ async fn cms_delete_component(
         (positions_partial(Some("true".to_string()), Arc::clone(&list_component_model), page_id))
         (component_partial(Some("true".to_string()), Arc::clone(&list_component_model)))
         (flash_partial(Flash::Success {
-            msg: "Deleted coponent successfully".to_string()
+            msg: "Deleted component successfully".to_string()
         }))
     })
 }
