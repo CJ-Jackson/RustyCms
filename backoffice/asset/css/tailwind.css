@@ -54,7 +54,7 @@
     }
 
     .content-wrapper {
-        @apply flex-auto;
+        @apply flex-auto pb-20;
     }
 }
 
@@ -96,6 +96,11 @@
 
 .flash-message {
     @apply fixed bottom-0 left-0 right-0 text-white p-4 text-center z-15;
+}
+
+.flash-message.htmx-swapping {
+    opacity: 0;
+    transition: opacity 4s ease-out;
 }
 
 .flash-message-success {

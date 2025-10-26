@@ -208,7 +208,7 @@ async fn cms_amend_page_post(
     Dep(cms_permission_check_service): Dep<CmsPermissionCheckService>,
     FormQs(amend_page_form): FormQs<AmendPageForm>,
     locale: Locale,
-) -> poem::Result<Markup> {
+) -> poem::Result<poem::Response> {
     cms_permission_check_service
         .check_permission_by_page_id(page_id as i64)
         .map_err(poem::Error::from_error_stack)?;
@@ -224,7 +224,8 @@ async fn cms_amend_page_post(
                 (flash_partial(Flash::Success {
                     msg: "Updated Info and Status".to_string()
                 }))
-            })
+            }
+            .into_response())
         }
         Err(error) => {
             let error_message = error.as_message(&locale);
@@ -233,7 +234,9 @@ async fn cms_amend_page_post(
                 (flash_partial(Flash::Error {
                     msg: "Failed to update info and status".to_string()
                 }))
-            })
+            }
+            .with_status(StatusCode::UNPROCESSABLE_ENTITY)
+            .into_response())
         }
     }
 }
@@ -268,14 +271,29 @@ async fn cms_update_position(
 
 #[handler]
 async fn cms_delete_component(
-    Path(component_id): Path<u64>,
+    Path((component_id, page_id)): Path<(u64, u64)>,
     Dep(cms_page_service): Dep<CmsPageService>,
     Dep(cms_permission_check_service): Dep<CmsPermissionCheckService>,
-) -> poem::Result<poem::Response> {
+) -> poem::Result<Markup> {
     cms_permission_check_service
         .check_permission_by_component_id(component_id as i64)
         .map_err(poem::Error::from_error_stack)?;
-    todo!()
+
+    cms_page_service
+        .delete_component(component_id as i64)
+        .map_err(poem::Error::from_error_stack)?;
+
+    let list_component_model = cms_page_service
+        .list_component(page_id as i64)
+        .map_err(poem::Error::from_error_stack)?;
+
+    Ok(html! {
+        (positions_partial(Some("true".to_string()), Arc::clone(&list_component_model), page_id))
+        (component_partial(Some("true".to_string()), Arc::clone(&list_component_model)))
+        (flash_partial(Flash::Success {
+            msg: "Deleted coponent successfully".to_string()
+        }))
+    })
 }
 
 pub fn cms_route() -> Route {
@@ -299,7 +317,7 @@ pub fn cms_route() -> Route {
         .at("/create-component", registry_ep_create())
         .at("/component", registry_ep_update_fetch())
         .at(
-            "/delete-component/:component_id",
+            "/delete-component/:component_id/:page_id",
             delete(cms_delete_component),
         )
 }

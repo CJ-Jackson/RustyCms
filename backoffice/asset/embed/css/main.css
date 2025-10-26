@@ -191,6 +191,9 @@
   .static {
     position: static;
   }
+  .float-right {
+    float: right;
+  }
   .container {
     width: 100%;
     @media (width >= 40rem) {
@@ -239,6 +242,9 @@
       max-height: calc(var(--spacing) * 4);
       max-width: calc(var(--spacing) * 4);
     }
+  }
+  .ml-2 {
+    margin-left: calc(var(--spacing) * 2);
   }
   .block {
     display: block;
@@ -360,6 +366,7 @@
   }
   .content-wrapper {
     flex: auto;
+    padding-bottom: calc(var(--spacing) * 20);
   }
 }
 .nav-content {
@@ -424,6 +431,10 @@
   padding: calc(var(--spacing) * 4);
   text-align: center;
   color: var(--color-white);
+}
+.flash-message.htmx-swapping {
+  opacity: 0;
+  transition: opacity 4s ease-out;
 }
 .flash-message-success {
   background-color: var(--color-green-500);
