@@ -49,18 +49,23 @@ impl MarkdownForm {
         html! {
             form .mt-3 .mb-3 .form hx-patch=(query.as_uri()) hx-swap="outerHTML" {
                 h4 { "Markdown" }
-                div .form-group id=(format!("markdown-label-group-{}", query.id)) {
-                    label .label for=(format!("markdown-label-group-label-{}", query.id)) { "Label" }
-                    input id=(format!("markdown-label-group-label-{}", query.id)) .form-item .w-full type="text" name="label" value=(self.label) required
-                        placeholder="Label" hx-patch=(query.as_uri()) hx-trigger="change" hx-swap="outerHTML"
-                        hx-target=(format!("#markdown-label-group-{}", query.id))
-                        hx-select=(format!("#markdown-label-group-{}", query.id))
+                div .form-group id=(format!("label-group-{}", query.id)) {
+                    label .label for=(format!("label-group-label-{}", query.id)) { "Label" }
+                    input id=(format!("label-group-label-{}", query.id)) .form-item .w-full type="text" name="label" value=(self.label) required
+                        placeholder="Label"
+                        hx-patch=(query.as_uri())
+                        hx-trigger="change"
+                        hx-swap="outerHTML"
+                        hx-target=(format!("#label-group-{}", query.id))
+                        hx-select=(format!("#label-group-{}", query.id))
                          {}
                     (errors.label.into_error_html())
                 }
                 div .form-group id=(format!("markdown-group-{}", query.id)) {
                     label .label for=(format!("markdown-group-label-{}", query.id)) { "Markdown" }
-                    textarea id=(format!("markdown-group-label-{}", query.id)) .form-item .w-full name="markdown" required hx-patch=(query.as_uri()) hx-swap="outerHTML"
+                    textarea id=(format!("markdown-group-label-{}", query.id)) .form-item .w-full name="markdown" required
+                        hx-patch=(query.as_uri())
+                        hx-swap="outerHTML"
                         hx-trigger="change"
                         hx-target=(format!("#markdown-group-{}", query.id))
                         hx-select=(format!("#markdown-group-{}", query.id))
