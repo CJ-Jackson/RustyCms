@@ -1,6 +1,8 @@
 use crate::common::html::HtmlBuilder;
 use crate::common::html::locale::top::TopBuildLocale;
-use crate::common::icon::{exclamation_circle_icon, home_icon, user_minus_icon, users_icon};
+use crate::common::icon::{
+    exclamation_circle_icon, home_icon, newspaper_icon, user_minus_icon, users_icon,
+};
 use crate::user::pointer::user_pointer::UserPointer;
 use crate::user::role::Role;
 use crate::user::route::login::LOGIN_ROUTE;
@@ -49,6 +51,14 @@ impl NavigationItem {
                 locale: "top-navigation-stack".to_string(),
                 role: Role::Root,
                 icon: exclamation_circle_icon(),
+            },
+            Self {
+                name: "CMS".to_string(),
+                url: "/cms/list-page".to_string(),
+                tag: "id-tag-cms".to_string(),
+                locale: "top-navigation-cms".to_string(),
+                role: Role::User,
+                icon: newspaper_icon(),
             },
         ]
         .into()

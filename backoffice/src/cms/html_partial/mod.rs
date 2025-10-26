@@ -20,7 +20,9 @@ pub fn positions_partial(
                                  title="Delete" {
                                 (trash_icon)
                             }
-                            label .label for=(format!("component-position-{}", component.id)) { (component.label) }
+                            label .label for=(format!("component-position-{}", component.id)) {
+                                span id=(format!{"component-position-label-{}", component.id}) { (component.label) }
+                            }
                             input .form-item .w-full type="number" id=(format!("component-position-{}", component.id))
                                 name=(format!("mapping[{}]", component.id)) value=(component.position) {}
                         }

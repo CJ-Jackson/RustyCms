@@ -73,6 +73,8 @@ async fn markdown_component_update(
                 .map_err(poem::Error::from_error_stack)?;
             Ok(html! {
                 (form.as_form_html(&query, None).await)
+                span id=(format!{"component-position-label-{}", query.id}) hx-swap-oob="true"
+                    { (validated.label.as_str()) }
             }
             .into_response())
         }

@@ -169,7 +169,7 @@ async fn cms_amend_page_get(
     amend_page_form.summary = page_model.summary;
     amend_page_form.status = page_model.status;
 
-    let title = format!("CMS Page {}", page_model.title);
+    let title = format!("CMS Page - {}", page_model.title);
 
     let list_component_model = cms_page_service
         .list_component(page_id as i64)
