@@ -119,7 +119,7 @@ export function start() {
     });
 
     document.body.addEventListener("htmx:configRequest", function (evt) {
-        if (evt.detail.verb !== "get") {
+        if (evt.detail.verb !== "get" && evt.detail.verb !== "head") {
             evt.detail.headers["X-Csrf-Token"] = getCsrfToken();
         }
     });
