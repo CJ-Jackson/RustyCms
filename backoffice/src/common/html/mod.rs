@@ -39,7 +39,7 @@ fn html_doc(title: &str, content: Markup, head: Markup, footer: Markup) -> Marku
                 (html_import_map())
                 (head)
             }
-            body .body hx-headers="js:{'X-Csrf-Token': csrfToken()}" {
+            body .body {
                 (content)
                 div #command { }
                 div #footer {
