@@ -306,7 +306,7 @@ pub fn cms_route() -> Route {
             "/update-position/:page_id",
             patch(with_serde_qs_config(
                 Config::default().use_form_encoding(true),
-                csrf_header_check(cms_update_position),
+                csrf_header_check_strict(cms_update_position),
             )),
         )
         .at("/create-component", registry_ep_create())
