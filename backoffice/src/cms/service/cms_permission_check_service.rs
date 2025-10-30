@@ -3,7 +3,7 @@ use crate::user::pointer::user_pointer::UserPointer;
 use crate::user::role::Role;
 use error_stack::{Report, ResultExt};
 use poem::http::StatusCode;
-use shared::context::{Context, ContextError, FromContext};
+use shared::utils::context::{Context, ContextError, FromContext};
 use thiserror::Error;
 
 #[derive(Debug, Error)]

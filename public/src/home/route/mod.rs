@@ -3,7 +3,7 @@ use crate::common::html::HtmlBuilder;
 use maud::{Markup, html};
 use poem::i18n::Locale;
 use poem::{get, handler};
-use shared::locale::LocaleExt;
+use shared::utils::locale::LocaleExt;
 
 #[handler]
 async fn home(locale: Locale) -> Markup {

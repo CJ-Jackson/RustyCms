@@ -8,7 +8,6 @@ use serde::Deserialize;
 pub struct UserLoginForm {
     pub username: String,
     pub password: String,
-    pub csrf_token: String,
 }
 
 impl UserLoginForm {
@@ -16,12 +15,8 @@ impl UserLoginForm {
         UserLoginFormResult((|| {
             let mut flag = FlagCounter::new();
 
-            let username = flag.check(Username::parse_user_login(Some(
-                self.username.as_str().trim(),
-            )));
-            let password = flag.check(Password::parse_user_login(Some(
-                self.password.as_str().trim(),
-            )));
+            let username = flag.check(Username::parse_user_login(Some(self.username.trim())));
+            let password = flag.check(Password::parse_user_login(Some(self.password.trim())));
 
             if flag.is_flagged() {
                 return Err(UserLoginFormError { username, password });

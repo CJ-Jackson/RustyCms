@@ -11,7 +11,7 @@ use cjtoolkit_structured_validator::types::username::{
 use maud::{Markup, html};
 use poem::i18n::Locale;
 use serde::{Deserialize, Serialize};
-use shared::locale::LocaleExtForResult;
+use shared::utils::locale::LocaleExtForResult;
 use std::sync::Arc;
 
 #[derive(Deserialize, Default)]
@@ -62,14 +62,17 @@ impl AddUserForm {
         &self,
         context_html_builder: &ContextHtmlBuilder,
         errors: Option<AddUserMessage>,
+        token: Option<Markup>,
     ) -> Markup {
         let errors = errors.unwrap_or_default();
         let user_form_locale = UserFormLocale::new(&context_html_builder.locale);
+        let token = token.unwrap_or_default();
         context_html_builder
             .attach_title(&user_form_locale.title_add)
             .attach_content(html! {
                 h1 .mt-3 { (user_form_locale.title_add) }
                 form hx-boost="true" hx-target="#main-content" .form method="post" {
+                    (token)
                     div .form-group {
                         label .label for="username" { (user_form_locale.username) }
                         input .form-item .w-full type="text" name="username" #username value=(self.username)

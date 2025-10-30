@@ -6,7 +6,7 @@ pub mod validate;
 use crate::common::embed::AssetHidden;
 use crate::common::js::{js_boot, js_vec_wrap};
 use maud::{DOCTYPE, Markup, PreEscaped, html};
-use shared::embed::EmbedAsString;
+use shared::utils::embed::EmbedAsString;
 
 fn html_import_map() -> Markup {
     let map = if cfg!(debug_assertions) {

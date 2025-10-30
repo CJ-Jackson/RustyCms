@@ -6,9 +6,9 @@ use crate::cms::service::cms_permission_check_service::CmsPermissionCheckService
 use poem::http::StatusCode;
 use poem::{Endpoint, FromRequest, IntoEndpoint, Request};
 use shared::cms::CmsComponentInfo;
-use shared::context::Dep;
-use shared::error::FromErrorStack;
-use shared::query_string::query::QueryQs;
+use shared::utils::context::Dep;
+use shared::utils::error::FromErrorStack;
+use shared::utils::query_string::query::QueryQs;
 use std::collections::HashMap;
 use std::sync::{Arc, OnceLock};
 

@@ -8,7 +8,7 @@ use cjtoolkit_structured_validator::types::name::name_alias::{Field, FieldError}
 use maud::{Markup, html};
 use poem::i18n::Locale;
 use serde::{Deserialize, Serialize};
-use shared::locale::LocaleExtForResult;
+use shared::utils::locale::LocaleExtForResult;
 use std::sync::Arc;
 
 #[derive(Deserialize, Default)]
@@ -23,8 +23,8 @@ impl MarkdownForm {
             async {
                 let mut flag = FlagCounter::new();
 
-                let label = flag.check(Field::parse_title(Some(&self.label)));
-                let markdown = flag.check(Text::parse_markdown(Some(&self.markdown)));
+                let label = flag.check(Field::parse_title(Some(self.label.trim())));
+                let markdown = flag.check(Text::parse_markdown(Some(self.markdown.trim())));
 
                 if flag.is_flagged() {
                     return Err(MarkdownFormError { label, markdown });

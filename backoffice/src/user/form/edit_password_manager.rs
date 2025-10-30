@@ -7,7 +7,7 @@ use cjtoolkit_structured_validator::types::password::{Password, PasswordError};
 use maud::{Markup, html};
 use poem::i18n::Locale;
 use serde::{Deserialize, Serialize};
-use shared::locale::LocaleExtForResult;
+use shared::utils::locale::LocaleExtForResult;
 use std::sync::Arc;
 
 #[derive(Deserialize, Default)]
@@ -23,8 +23,8 @@ impl EditPasswordManagerForm {
                 let mut flag = FlagCounter::new();
 
                 let (password, password_confirm) = Password::parse_password_add(
-                    Some(&self.password.trim()),
-                    &self.password_confirm.trim(),
+                    Some(self.password.trim()),
+                    self.password_confirm.trim(),
                 );
                 let password = flag.check(password);
                 let password_confirm = flag.check(password_confirm);
@@ -50,16 +50,19 @@ impl EditPasswordManagerForm {
         context_html_builder: &ContextHtmlBuilder,
         errors: Option<EditPasswordManagerMessage>,
         username: Option<String>,
+        token: Option<Markup>,
     ) -> Markup {
         let errors = errors.unwrap_or_default();
         let user_form_locale = UserFormLocale::new(&context_html_builder.locale);
         let username = username.unwrap_or_default();
+        let token = token.unwrap_or_default();
         context_html_builder
             .attach_title(&user_form_locale.title_edit_password)
             .attach_content(html! {
                 h1 .mt-3 { (user_form_locale.title_edit_password) }
                 h2 { (username) }
                 form hx-boost="true" hx-target="#main-content" .form method="post" {
+                    (token)
                     div .form-group {
                         label .label for="password" { (user_form_locale.password) }
                         input .form-item .w-full type="password" name="password" #password

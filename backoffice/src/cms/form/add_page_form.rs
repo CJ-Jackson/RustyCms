@@ -6,7 +6,7 @@ use cjtoolkit_structured_validator::types::name::name_alias::{Title, TitleError}
 use maud::{Markup, html};
 use poem::i18n::Locale;
 use serde::{Deserialize, Serialize};
-use shared::locale::LocaleExtForResult;
+use shared::utils::locale::LocaleExtForResult;
 use std::sync::Arc;
 
 #[derive(Deserialize, Default)]
@@ -20,7 +20,7 @@ impl AddPageForm {
             async {
                 let mut flag = FlagCounter::new();
 
-                let title = flag.check(Title::parse_title(Some(&self.title)));
+                let title = flag.check(Title::parse_title(Some(self.title.trim())));
 
                 if flag.is_flagged() {
                     return Err(AddPageFormError { title });
@@ -38,12 +38,15 @@ impl AddPageForm {
         &self,
         context_html_builder: &ContextHtmlBuilder,
         errors: Option<AddPageFormMessage>,
+        token: Option<Markup>,
     ) -> Markup {
         let errors = errors.unwrap_or_default();
+        let token = token.unwrap_or_default();
 
         context_html_builder.attach_title("Add Page").attach_content(html! {
             h1 .mt-3 { "Add Page" }
             form hx-boost="true" hx-target="#main-content" .form method="post" {
+                (token)
                 div .form-group {
                     label .label for="add-title" { "Title" }
                     input .form-item .w-full type="text" #add-title name="title" value=(self.title) required

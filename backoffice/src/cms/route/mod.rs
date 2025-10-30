@@ -15,16 +15,16 @@ use maud::{Markup, html};
 use poem::http::StatusCode;
 use poem::i18n::Locale;
 use poem::session::Session;
-use poem::web::{Path, Redirect};
+use poem::web::{CsrfToken, Path, Redirect};
 use poem::{IntoResponse, Route, delete, get, handler, patch};
 use serde_qs::Config;
-use shared::context::Dep;
-use shared::csrf::csrf_header_check;
-use shared::error::{ExtraResultExt, FromErrorStack};
-use shared::flash::{Flash, FlashMessage};
-use shared::htmx::HtmxHeader;
-use shared::query_string::form::FormQs;
-use shared::query_string::serde_qs_config::with_serde_qs_config;
+use shared::utils::context::Dep;
+use shared::utils::csrf::{CsrfFormQs, CsrfTokenHtml, csrf_header_check, csrf_header_check_strict};
+use shared::utils::error::{ExtraResultExt, FromErrorStack};
+use shared::utils::flash::{Flash, FlashMessage};
+use shared::utils::htmx::HtmxHeader;
+use shared::utils::query_string::form::FormQs;
+use shared::utils::query_string::serde_qs_config::with_serde_qs_config;
 use std::sync::Arc;
 
 pub mod component;
@@ -96,10 +96,11 @@ async fn cms_list_page(
 #[handler]
 async fn cms_create_page_get(
     Dep(context_html_builder): Dep<ContextHtmlBuilder>,
+    csrf_token: &CsrfToken,
 ) -> poem::Result<Markup> {
     let add_page_form = AddPageForm::default();
     Ok(add_page_form
-        .as_form_html(&context_html_builder, None)
+        .as_form_html(&context_html_builder, None, Some(csrf_token.as_html()))
         .await)
 }
 
@@ -107,9 +108,10 @@ async fn cms_create_page_get(
 async fn cms_create_page_post(
     Dep(context_html_builder): Dep<ContextHtmlBuilder>,
     Dep(cms_page_service): Dep<CmsPageService>,
-    FormQs(add_page_form): FormQs<AddPageForm>,
+    CsrfFormQs(add_page_form): CsrfFormQs<AddPageForm>,
     session: &Session,
     htmx_header: HtmxHeader,
+    csrf_token: &CsrfToken,
 ) -> poem::Result<poem::Response> {
     let validated_form = add_page_form.as_validated().await.0;
     let l = &context_html_builder.locale;
@@ -131,7 +133,11 @@ async fn cms_create_page_post(
             let error_message = error.as_message(l);
             context_html_builder.attach_form_flash_error();
             Ok(add_page_form
-                .as_form_html(&context_html_builder, Some(error_message))
+                .as_form_html(
+                    &context_html_builder,
+                    Some(error_message),
+                    Some(csrf_token.as_html()),
+                )
                 .await
                 .with_status(StatusCode::UNPROCESSABLE_ENTITY)
                 .into_response())
@@ -294,7 +300,7 @@ pub fn cms_route() -> Route {
         )
         .at(
             "/amend-page/:page_id",
-            get(cms_amend_page_get).post(csrf_header_check(cms_amend_page_post)),
+            get(cms_amend_page_get).post(csrf_header_check_strict(cms_amend_page_post)),
         )
         .at(
             "/update-position/:page_id",
@@ -307,6 +313,6 @@ pub fn cms_route() -> Route {
         .at("/component", registry_ep_update_fetch())
         .at(
             "/delete-component/:component_id/:page_id",
-            delete(csrf_header_check(cms_delete_component)),
+            delete(csrf_header_check_strict(cms_delete_component)),
         )
 }

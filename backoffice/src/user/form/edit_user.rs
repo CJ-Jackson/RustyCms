@@ -10,7 +10,7 @@ use cjtoolkit_structured_validator::types::username::{
 use maud::{Markup, html};
 use poem::i18n::Locale;
 use serde::{Deserialize, Serialize};
-use shared::locale::LocaleExtForResult;
+use shared::utils::locale::LocaleExtForResult;
 use std::sync::Arc;
 
 #[derive(Deserialize, Default)]
@@ -31,7 +31,7 @@ impl EditUserForm {
 
                 let username = flag.check(
                     Username::parse_user_add(
-                        Some(&self.username.trim()),
+                        Some(self.username.trim()),
                         service,
                         Some(current_user_name),
                     )
@@ -41,13 +41,13 @@ impl EditUserForm {
                 if flag.is_flagged() {
                     return Err(EditUserError {
                         username,
-                        role: self.role.clone(),
+                        role: self.role,
                     });
                 }
 
                 Ok(EditUserValidated {
                     username: username.expect("Username is not empty"),
-                    role: self.role.clone(),
+                    role: self.role,
                 })
             }
             .await,
@@ -59,14 +59,17 @@ impl EditUserForm {
         context_html_builder: &ContextHtmlBuilder,
         errors: Option<EditUserMessage>,
         username: Option<String>,
+        token: Option<Markup>,
     ) -> Markup {
         let errors = errors.unwrap_or_default();
         let user_form_locale = UserFormLocale::new(&context_html_builder.locale);
         let username = username.unwrap_or_default();
+        let token = token.unwrap_or_default();
         context_html_builder.attach_title(&user_form_locale.title_edit).attach_content(html! {
             h1 .mt-3 { (user_form_locale.title_edit) }
             h2 { (username) }
             form hx-boost="true" hx-target="#main-content" .form method="post" {
+                (token)
                 div .form-group {
                     label .label for="username" { (user_form_locale.username) } br;
                     input .form-item .w-full type="text" name="username" #username value=(self.username)

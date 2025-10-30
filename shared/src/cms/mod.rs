@@ -1,4 +1,4 @@
-use crate::context::{Context, ContextError, FromContext};
+use crate::utils::context::{Context, ContextError, FromContext};
 use error_stack::Report;
 
 pub mod components;

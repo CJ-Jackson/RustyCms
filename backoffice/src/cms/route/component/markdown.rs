@@ -10,10 +10,10 @@ use poem::i18n::Locale;
 use poem::{IntoResponse, get, handler};
 use shared::cms::components::markdown::MarkdownComponent;
 use shared::cms::markers::ComponentInfoMarker;
-use shared::context::Dep;
-use shared::csrf::csrf_header_check;
-use shared::error::FromErrorStack;
-use shared::query_string::form::FormQs;
+use shared::utils::context::Dep;
+use shared::utils::csrf::csrf_header_check_strict;
+use shared::utils::error::FromErrorStack;
+use shared::utils::query_string::form::FormQs;
 use std::sync::Arc;
 
 #[handler]
@@ -95,6 +95,6 @@ pub fn markdown_registry_item() -> ComponentMethods {
         info: MarkdownComponent::component_info(),
         create: get(markdown_component_create),
         update_fetch: get(markdown_component_fetch)
-            .patch(csrf_header_check(markdown_component_update)),
+            .patch(csrf_header_check_strict(markdown_component_update)),
     }
 }

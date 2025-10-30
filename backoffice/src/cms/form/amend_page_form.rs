@@ -10,7 +10,7 @@ use maud::{Markup, html};
 use poem::i18n::Locale;
 use serde::{Deserialize, Serialize};
 use shared::cms::status::CmsPageStatus;
-use shared::locale::LocaleExtForResult;
+use shared::utils::locale::LocaleExtForResult;
 use std::sync::Arc;
 
 #[derive(Deserialize, Default)]
@@ -26,8 +26,8 @@ impl AmendPageForm {
             async {
                 let mut flag = FlagCounter::new();
 
-                let title = flag.check(Title::parse_title(Some(&self.title)));
-                let summary = flag.check(Summary::parse_summary(Some(&self.summary)));
+                let title = flag.check(Title::parse_title(Some(self.title.trim())));
+                let summary = flag.check(Summary::parse_summary(Some(self.summary.trim())));
 
                 if flag.is_flagged() {
                     return Err(AmendPageFormError { title, summary });

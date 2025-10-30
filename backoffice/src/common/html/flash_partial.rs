@@ -1,5 +1,5 @@
 use maud::{Markup, html};
-use shared::flash::Flash;
+use shared::utils::flash::Flash;
 
 pub fn flash_partial(flash: Flash) -> Markup {
     html! {

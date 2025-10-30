@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 pub mod user_role_check;
 pub mod visitor_only;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Role {
     Root,
     User,

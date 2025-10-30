@@ -16,15 +16,14 @@ use maud::{Markup, html};
 use poem::http::StatusCode;
 use poem::i18n::{I18NArgs, Locale};
 use poem::session::Session;
-use poem::web::{Path, Redirect};
+use poem::web::{CsrfToken, Path, Redirect};
 use poem::{Error, IntoResponse, Response, Route, get, handler};
-use shared::context::Dep;
-use shared::csrf::csrf_header_check;
-use shared::error::{ExtraResultExt, FromErrorStack};
-use shared::flash::{Flash, FlashMessage};
-use shared::htmx::HtmxHeader;
-use shared::locale::LocaleExt;
-use shared::query_string::form::FormQs;
+use shared::utils::context::Dep;
+use shared::utils::csrf::{CsrfFormQs, CsrfTokenHtml, csrf_header_check};
+use shared::utils::error::{ExtraResultExt, FromErrorStack};
+use shared::utils::flash::{Flash, FlashMessage};
+use shared::utils::htmx::HtmxHeader;
+use shared::utils::locale::LocaleExt;
 
 pub const USER_ROUTE: &str = "/user";
 
@@ -109,6 +108,7 @@ async fn edit_user_get(
     Dep(context_html_builder): Dep<ContextHtmlBuilder>,
     Dep(edit_user_service): Dep<EditUserService>,
     Path(user_id): Path<i64>,
+    csrf_token: &CsrfToken,
 ) -> poem::Result<Markup> {
     let subject_user = edit_user_service
         .fetch_user(user_id)
@@ -119,7 +119,12 @@ async fn edit_user_get(
     edit_user.role = subject_user.role;
 
     Ok(edit_user
-        .as_form_html(&context_html_builder, None, Some(subject_user.username))
+        .as_form_html(
+            &context_html_builder,
+            None,
+            Some(subject_user.username),
+            Some(csrf_token.as_html()),
+        )
         .await)
 }
 
@@ -128,9 +133,10 @@ async fn edit_user_post(
     Dep(context_html_builder): Dep<ContextHtmlBuilder>,
     Dep(edit_user_service): Dep<EditUserService>,
     Path(user_id): Path<i64>,
-    FormQs(edit_user_form): FormQs<EditUserForm>,
+    CsrfFormQs(edit_user_form): CsrfFormQs<EditUserForm>,
     session: &Session,
     htmx_header: HtmxHeader,
+    csrf_token: &CsrfToken,
 ) -> poem::Result<Response> {
     let subject_user = edit_user_service
         .fetch_user(user_id)
@@ -167,6 +173,7 @@ async fn edit_user_post(
                         &context_html_builder,
                         Some(errors),
                         Some(subject_user.username),
+                        Some(csrf_token.as_html()),
                     )
                     .await,
             )
@@ -180,6 +187,7 @@ async fn edit_user_password_get(
     Dep(context_html_builder): Dep<ContextHtmlBuilder>,
     Dep(edit_password_service): Dep<EditPasswordService>,
     Path(user_id): Path<i64>,
+    csrf_token: &CsrfToken,
 ) -> poem::Result<Markup> {
     let subject_user = edit_password_service
         .fetch_user(user_id)
@@ -188,7 +196,12 @@ async fn edit_user_password_get(
     let edit_password_form = EditPasswordManagerForm::default();
 
     Ok(edit_password_form
-        .as_form_html(&context_html_builder, None, Some(subject_user.username))
+        .as_form_html(
+            &context_html_builder,
+            None,
+            Some(subject_user.username),
+            Some(csrf_token.as_html()),
+        )
         .await)
 }
 
@@ -197,9 +210,10 @@ async fn edit_user_password_post(
     Dep(context_html_builder): Dep<ContextHtmlBuilder>,
     Dep(edit_password_service): Dep<EditPasswordService>,
     Path(user_id): Path<i64>,
-    FormQs(edit_password_manager_form): FormQs<EditPasswordManagerForm>,
+    CsrfFormQs(edit_password_manager_form): CsrfFormQs<EditPasswordManagerForm>,
     session: &Session,
     htmx_header: HtmxHeader,
+    csrf_token: &CsrfToken,
 ) -> poem::Result<Response> {
     let subject_user = edit_password_service
         .fetch_user(user_id)
@@ -233,6 +247,7 @@ async fn edit_user_password_post(
                         &context_html_builder,
                         Some(errors),
                         Some(subject_user.username),
+                        Some(csrf_token.as_html()),
                     )
                     .await,
             )
@@ -244,11 +259,12 @@ async fn edit_user_password_post(
 #[handler]
 async fn add_user_password_get(
     Dep(context_html_builder): Dep<ContextHtmlBuilder>,
+    csrf_token: &CsrfToken,
 ) -> poem::Result<Markup> {
     let add_user_form = AddUserForm::default();
 
     Ok(add_user_form
-        .as_form_html(&context_html_builder, None)
+        .as_form_html(&context_html_builder, None, Some(csrf_token.as_html()))
         .await)
 }
 
@@ -256,9 +272,10 @@ async fn add_user_password_get(
 async fn add_user_password_post(
     Dep(context_html_builder): Dep<ContextHtmlBuilder>,
     Dep(add_user_service): Dep<AddUserService>,
-    FormQs(add_user_form): FormQs<AddUserForm>,
+    CsrfFormQs(add_user_form): CsrfFormQs<AddUserForm>,
     session: &Session,
     htmx_header: HtmxHeader,
+    csrf_token: &CsrfToken,
 ) -> poem::Result<Response> {
     let validated_result = add_user_form.as_validated(&add_user_service).await.0;
     let l = &context_html_builder.locale;
@@ -286,7 +303,11 @@ async fn add_user_password_post(
             context_html_builder.attach_form_flash_error();
             Ok(PostResponse::Validation(
                 add_user_form
-                    .as_form_html(&context_html_builder, Some(errors))
+                    .as_form_html(
+                        &context_html_builder,
+                        Some(errors),
+                        Some(csrf_token.as_html()),
+                    )
                     .await,
             )
             .into_response())

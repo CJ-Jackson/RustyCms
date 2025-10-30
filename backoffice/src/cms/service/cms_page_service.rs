@@ -9,7 +9,7 @@ use crate::cms::repository::cms_repository::CmsRepository;
 use crate::user::pointer::user_pointer::UserPointer;
 use error_stack::{Report, ResultExt};
 use poem::http::StatusCode;
-use shared::context::{Context, ContextError, FromContext};
+use shared::utils::context::{Context, ContextError, FromContext};
 use std::sync::Arc;
 use thiserror::Error;
 

@@ -8,7 +8,7 @@ use error_stack::{Report, ResultExt};
 use shared::cms::CmsComponentInfo;
 use shared::cms::components::markdown::MarkdownComponent;
 use shared::cms::markers::ComponentDataMarker;
-use shared::context::{Context, ContextError, FromContext};
+use shared::utils::context::{Context, ContextError, FromContext};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
