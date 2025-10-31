@@ -9,6 +9,9 @@ pub struct ReturningIdModel(pub i64);
 #[derive(Debug)]
 pub struct UserIdModel(pub i64);
 
+#[derive(Debug)]
+pub struct FilePath(pub String);
+
 pub struct AddFileAttachmentModel {
     pub component_id: i64,
     pub file_name: String,

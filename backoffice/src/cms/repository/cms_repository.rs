@@ -1,7 +1,8 @@
 use crate::cms::data_model::cms_data::{
     AddFileAttachmentModel, AddPageModel, CreateComponentModel, FetchComponentModel,
-    FetchPageModel, ListComponentModel, ListFileAttachmentModel, ListPageModel, ReturningIdModel,
-    UpdateComponentModel, UpdateComponentPositionModel, UpdatePageModel, UserIdModel,
+    FetchPageModel, FilePath, ListComponentModel, ListFileAttachmentModel, ListPageModel,
+    ReturningIdModel, UpdateComponentModel, UpdateComponentPositionModel, UpdatePageModel,
+    UserIdModel,
 };
 use error_stack::{Report, ResultExt};
 use poem::http::StatusCode;
@@ -287,6 +288,30 @@ impl CmsRepository {
                     ":id": id,
                 },
                 |row| Ok(UserIdModel(row.get("user_id")?)),
+            )
+            .optional()
+            .change_context(CmsRepositoryError::RowValueError)
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
+
+        Ok(row)
+    }
+
+    pub fn get_file_path(&self, id: i64) -> Result<Option<FilePath>, Report<CmsRepositoryError>> {
+        let conn = self.borrow_conn()?;
+
+        let mut stmt = conn
+            .prepare(include_str!("_sql/cms_repository/get_file_path.sql"))
+            .change_context(CmsRepositoryError::QueryError)
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
+
+        let row: Option<FilePath> = stmt
+            .query_one(
+                named_params! {
+                    ":id": id
+                },
+                |row| Ok(FilePath(row.get("file_path")?)),
             )
             .optional()
             .change_context(CmsRepositoryError::RowValueError)
