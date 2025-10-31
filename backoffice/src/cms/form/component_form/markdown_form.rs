@@ -48,7 +48,6 @@ impl MarkdownForm {
 
         html! {
             form .mt-3 .mb-3 .form hx-patch=(query.as_uri()) hx-swap="outerHTML" {
-                h4 { "Markdown" }
                 div .form-group id=(format!("label-group-{}", query.id)) {
                     label .label for=(format!("label-group-label-{}", query.id)) { "Label" }
                     input id=(format!("label-group-label-{}", query.id)) .form-item .w-full type="text" name="label" value=(self.label) required

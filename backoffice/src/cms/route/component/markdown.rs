@@ -35,6 +35,7 @@ async fn markdown_component_create(
         .map_err(poem::Error::from_error_stack)?;
 
     Ok(html! {
+        h4 { "Markdown" }
         (form.as_form_html(&update_fetch_query, None).await)
         (positions_partial(Some("true".to_string()), Arc::clone(&list_component_model), query.page_id))
     })
@@ -54,6 +55,7 @@ async fn markdown_component_fetch(
     form.markdown = markdown_component_model.raw_data.content.clone();
 
     Ok(html! {
+        h4 { "Markdown" }
         (form.as_form_html(&query, None).await)
     })
 }
