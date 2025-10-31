@@ -45,8 +45,7 @@ impl Endpoint for RouteHeader {
     type Output = Response;
 
     async fn call(&self, req: Request) -> poem::Result<Self::Output> {
-        let header_value = req.header(self.header_name.as_str());
-        match header_value {
+        match req.header(self.header_name.as_str()) {
             None => self.default_route.call(req).await,
             Some(header_value) => {
                 if let Some(route) = self.routes.get(header_value.trim()) {
