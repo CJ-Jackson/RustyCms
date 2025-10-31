@@ -47,3 +47,14 @@ create table cms_component
     raw_data  blob                              not null,
     foreign key (page_id) references cms_page (id) on delete cascade
 );
+
+create table cms_file_attachment
+(
+    id           integer primary key autoincrement not null,
+    component_id integer                           not null,
+    file_name    text                              not null,
+    file_path    text                              not null,
+    file_type    text                              not null,
+    uploaded     text                              not null default CURRENT_TIMESTAMP,
+    foreign key (component_id) references cms_component (id) on delete cascade
+);

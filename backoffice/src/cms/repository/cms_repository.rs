@@ -1,7 +1,7 @@
 use crate::cms::data_model::cms_data::{
-    AddPageModel, CreateComponentModel, FetchComponentModel, FetchPageModel, ListComponentModel,
-    ListPageModel, ReturningIdModel, UpdateComponentModel, UpdateComponentPositionModel,
-    UpdatePageModel, UserIdModel,
+    AddFileAttachmentModel, AddPageModel, CreateComponentModel, FetchComponentModel,
+    FetchPageModel, ListComponentModel, ListFileAttachmentModel, ListPageModel, ReturningIdModel,
+    UpdateComponentModel, UpdateComponentPositionModel, UpdatePageModel, UserIdModel,
 };
 use error_stack::{Report, ResultExt};
 use poem::http::StatusCode;
@@ -42,6 +42,28 @@ impl CmsRepository {
 }
 
 impl CmsRepository {
+    pub fn add_file_attachment(
+        &self,
+        add_file_attachment_model: AddFileAttachmentModel,
+    ) -> Result<(), Report<CmsRepositoryError>> {
+        let conn = self.borrow_conn()?;
+
+        conn.execute(
+            include_str!("_sql/cms_repository/add_file_attachment.sql"),
+            named_params! {
+                ":component_id": add_file_attachment_model.component_id,
+                ":file_name": add_file_attachment_model.file_name,
+                ":file_path": add_file_attachment_model.file_path,
+                ":file_type": add_file_attachment_model.file_type,
+            },
+        )
+        .change_context(CmsRepositoryError::QueryError)
+        .attach(StatusCode::INTERNAL_SERVER_ERROR)
+        .log_it()?;
+
+        Ok(())
+    }
+
     pub fn add_page(
         &self,
         page: AddPageModel,
@@ -106,6 +128,41 @@ impl CmsRepository {
             include_str!("_sql/cms_repository/delete_component.sql"),
             named_params! {
                 ":id": id,
+            },
+        )
+        .change_context(CmsRepositoryError::QueryError)
+        .attach(StatusCode::INTERNAL_SERVER_ERROR)
+        .log_it()?;
+
+        Ok(())
+    }
+
+    pub fn delete_file_attachment(&self, id: i64) -> Result<(), Report<CmsRepositoryError>> {
+        let conn = self.borrow_conn()?;
+
+        conn.execute(
+            include_str!("_sql/cms_repository/delete_file_attachment.sql"),
+            named_params! {
+                ":id": id,
+            },
+        )
+        .change_context(CmsRepositoryError::QueryError)
+        .attach(StatusCode::INTERNAL_SERVER_ERROR)
+        .log_it()?;
+
+        Ok(())
+    }
+
+    pub fn delete_file_attachment_by_component_id(
+        &self,
+        component_id: i64,
+    ) -> Result<(), Report<CmsRepositoryError>> {
+        let conn = self.borrow_conn()?;
+
+        conn.execute(
+            include_str!("_sql/cms_repository/delele_file_attachment_component.sql"),
+            named_params! {
+                ":component_id": component_id,
             },
         )
         .change_context(CmsRepositoryError::QueryError)
@@ -262,6 +319,48 @@ impl CmsRepository {
                         kind_uuid: row.get("kind_uuid")?,
                         position: row.get("position")?,
                         label: row.get("label")?,
+                    })
+                },
+            )
+            .change_context(CmsRepositoryError::RowValueError)
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
+
+        let rows = rows
+            .collect::<Result<Vec<_>, _>>()
+            .change_context(CmsRepositoryError::RowValueError)
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
+
+        Ok(rows.into())
+    }
+
+    pub fn list_file_attachment(
+        &self,
+        component_id: i64,
+    ) -> Result<Arc<[ListFileAttachmentModel]>, Report<CmsRepositoryError>> {
+        let conn = self.borrow_conn()?;
+
+        let mut stmt = conn
+            .prepare(include_str!(
+                "_sql/cms_repository/list_file_attachment_component.sql"
+            ))
+            .change_context(CmsRepositoryError::QueryError)
+            .attach(StatusCode::INTERNAL_SERVER_ERROR)
+            .log_it()?;
+
+        let rows = stmt
+            .query_map(
+                named_params! {
+                    ":component_id": component_id,
+                },
+                |row| {
+                    Ok(ListFileAttachmentModel {
+                        id: row.get("id")?,
+                        file_name: row.get("file_name")?,
+                        file_path: row.get("file_path")?,
+                        file_type: row.get("file_type")?,
+                        uploaded: row.get("uploaded")?,
                     })
                 },
             )

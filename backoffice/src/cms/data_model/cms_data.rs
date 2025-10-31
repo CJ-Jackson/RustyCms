@@ -9,6 +9,13 @@ pub struct ReturningIdModel(pub i64);
 #[derive(Debug)]
 pub struct UserIdModel(pub i64);
 
+pub struct AddFileAttachmentModel {
+    pub component_id: i64,
+    pub file_name: String,
+    pub file_path: String,
+    pub file_type: String,
+}
+
 #[derive(Debug)]
 pub struct AddPageModel {
     pub user_id: i64,
@@ -51,6 +58,15 @@ impl ListComponentModel {
     pub fn as_query(&self) -> UpdateFetchQuery {
         UpdateFetchQuery::new(self.kind_uuid.clone(), self.id as u64)
     }
+}
+
+#[derive(Debug)]
+pub struct ListFileAttachmentModel {
+    pub id: i64,
+    pub file_name: String,
+    pub file_path: String,
+    pub file_type: String,
+    pub uploaded: DateTime<Utc>,
 }
 
 #[derive(Debug)]

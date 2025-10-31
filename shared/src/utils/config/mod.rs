@@ -25,6 +25,7 @@ pub struct Config {
     pub poem_public: Arc<PoemConfig>,
     pub poem_backoffice: Arc<PoemConfig>,
     pub sqlite: Arc<SqliteConfig>,
+    pub file_path: String,
 }
 
 impl Default for Config {
@@ -36,6 +37,7 @@ impl Default for Config {
                 port: 8001,
             }),
             sqlite: Arc::new(SqliteConfig::default()),
+            file_path: "./files".to_string(),
         }
     }
 }
