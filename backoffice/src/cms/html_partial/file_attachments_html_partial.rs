@@ -39,7 +39,6 @@ pub fn file_attachments_list_partial(
                         }
                     }
                 }
-
             }
             span hx-get=(update_fetch_query.as_uri()) hx-headers=(json!({"X-Route": "form"})) hx-trigger="load" {}
         }
