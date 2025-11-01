@@ -24,7 +24,7 @@ pub struct CmsAttachmentService {
 }
 
 impl CmsAttachmentService {
-    const SAVE_PATH: &'static str = "cms/files";
+    const SAVE_PATH: &'static str = "/cms/files";
 
     pub fn new(file_upload_path: String, cms_repository: CmsRepository) -> Self {
         Self {

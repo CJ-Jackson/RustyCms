@@ -1,3 +1,5 @@
+pub mod file_attachments_html_partial;
+
 use crate::cms::data_model::cms_data::ListComponentModel;
 use crate::cms::route::CMS_ROUTE;
 use crate::common::icon::trash_icon;

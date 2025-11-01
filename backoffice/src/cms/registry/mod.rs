@@ -1,6 +1,7 @@
 use crate::cms::enums::ComponentRequestKind;
 use crate::cms::methods::ComponentMethods;
 use crate::cms::query_model::{CreateQuery, UpdateFetchQuery};
+use crate::cms::route::component::file_attachments::file_attachments_registry_item;
 use crate::cms::route::component::markdown::markdown_registry_item;
 use crate::cms::service::cms_permission_check_service::CmsPermissionCheckService;
 use poem::http::StatusCode;
@@ -31,6 +32,7 @@ fn registry() -> Registry {
         let mut map: HashMap<String, ComponentMethods> = HashMap::new();
 
         insert(&mut map, markdown_registry_item());
+        insert(&mut map, file_attachments_registry_item());
 
         Registry(Arc::new(map))
     });

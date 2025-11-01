@@ -35,8 +35,8 @@ async fn markdown_component_create(
         .map_err(poem::Error::from_error_stack)?;
 
     Ok(html! {
-        h4 { "Markdown" }
-        (form.as_form_html(&update_fetch_query, None).await)
+        h4 .mt-3 { "Markdown" }
+        (form.as_form_html(&update_fetch_query, None))
         (positions_partial(Some("true".to_string()), Arc::clone(&list_component_model), query.page_id))
     })
 }
@@ -55,8 +55,8 @@ async fn markdown_component_fetch(
     form.markdown = markdown_component_model.raw_data.content.clone();
 
     Ok(html! {
-        h4 { "Markdown" }
-        (form.as_form_html(&query, None).await)
+        h4 .mt-3 { "Markdown" }
+        (form.as_form_html(&query, None))
     })
 }
 
@@ -75,7 +75,7 @@ async fn markdown_component_update(
                 .update_component(&query, &validated)
                 .map_err(poem::Error::from_error_stack)?;
             Ok(html! {
-                (form.as_form_html(&query, None).await)
+                (form.as_form_html(&query, None))
                 span id=(format!{"component-position-label-{}", query.id}) hx-swap-oob="true"
                     { (validated.label.as_str()) }
             }
@@ -84,7 +84,7 @@ async fn markdown_component_update(
         Err(verror) => {
             let message = verror.as_message(&locale);
             Ok(html! {
-                (form.as_form_html(&query, Some(message)).await)
+                (form.as_form_html(&query, Some(message)))
             }
             .with_status(StatusCode::UNPROCESSABLE_ENTITY)
             .into_response())

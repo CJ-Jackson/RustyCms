@@ -39,7 +39,7 @@ impl MarkdownForm {
         )
     }
 
-    pub async fn as_form_html(
+    pub fn as_form_html(
         &self,
         query: &UpdateFetchQuery,
         errors: Option<MarkdownFormMessage>,
@@ -47,10 +47,10 @@ impl MarkdownForm {
         let errors = errors.unwrap_or_default();
 
         html! {
-            form .mt-3 .mb-3 .form hx-patch=(query.as_uri()) hx-swap="outerHTML" {
+            form .mb-3 .form hx-patch=(query.as_uri()) hx-swap="outerHTML" {
                 div .form-group id=(format!("label-group-{}", query.id)) {
                     label .label for=(format!("label-group-label-{}", query.id)) { "Label" }
-                    input id=(format!("label-group-label-{}", query.id)) .form-item .w-full type="text" name="label" value=(self.label) required
+                    input id=(format!("label-group-label-{}", query.id)) .form-item .w-full type="text" name="label" value=(self.label)
                         placeholder="Label"
                         hx-patch=(query.as_uri())
                         hx-trigger="change"
@@ -62,7 +62,7 @@ impl MarkdownForm {
                 }
                 div .form-group id=(format!("markdown-group-{}", query.id)) {
                     label .label for=(format!("markdown-group-label-{}", query.id)) { "Markdown" }
-                    textarea id=(format!("markdown-group-label-{}", query.id)) .form-item .w-full name="markdown" required
+                    textarea id=(format!("markdown-group-label-{}", query.id)) .form-item .w-full name="markdown"
                         hx-patch=(query.as_uri())
                         hx-swap="outerHTML"
                         hx-trigger="change"
