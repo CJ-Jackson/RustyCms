@@ -18,7 +18,7 @@ pub fn positions_partial(
                 form .form hx-patch=(format!("{}/update-position/{}", CMS_ROUTE, page_id)) hx-target="this" hx-swap="outerHTML" {
                     @for component in components.iter() {
                         div .form-group {
-                            a .icon .float-right .ml-2 hx-delete=(format!("{}/delete-component/{}/{}", CMS_ROUTE, component.id, page_id)) hx-confirm="Are you sure?"
+                            a .icon .cursor-pointer .float-right .ml-2 hx-delete=(format!("{}/delete-component/{}/{}", CMS_ROUTE, component.id, page_id)) hx-confirm="Are you sure?"
                                  title="Delete" {
                                 (trash_icon)
                             }

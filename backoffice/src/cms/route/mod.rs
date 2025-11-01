@@ -4,6 +4,7 @@ use crate::cms::form::component_position_form::ComponentPositionForm;
 use crate::cms::html_partial::{component_partial, positions_partial};
 use crate::cms::query_model::CreateQueryExt;
 use crate::cms::registry::{registry_ep_create, registry_ep_update_fetch, registry_item};
+use crate::cms::service::cms_attachment_service::CmsAttachmentService;
 use crate::cms::service::cms_page_service::CmsPageService;
 use crate::cms::service::cms_permission_check_service::CmsPermissionCheckService;
 use crate::common::html::context_html::ContextHtmlBuilder;
@@ -187,7 +188,7 @@ async fn cms_amend_page_get(
                 div class="basis-1/5" {
                     h3 { "Add Component" }
                     @for item in registry_item().iter() {
-                        span .btn .btn-sky-blue hx-get=(item.as_create_query(page_id).as_uri())
+                        span .btn .btn-sky-blue .mb-2 hx-get=(item.as_create_query(page_id).as_uri())
                         hx-target="#components" hx-swap="beforeend" { (item.kind) }
                     }
                 }
@@ -269,9 +270,14 @@ async fn cms_delete_component(
     Path((component_id, page_id)): Path<(u64, u64)>,
     Dep(cms_page_service): Dep<CmsPageService>,
     Dep(cms_permission_check_service): Dep<CmsPermissionCheckService>,
+    Dep(cms_attachment_service): Dep<CmsAttachmentService>,
 ) -> poem::Result<Markup> {
     cms_permission_check_service
         .check_permission_by_component_id(component_id as i64)
+        .map_err(poem::Error::from_error_stack)?;
+
+    cms_attachment_service
+        .delete_file_by_component_id(component_id as i64)
         .map_err(poem::Error::from_error_stack)?;
 
     cms_page_service

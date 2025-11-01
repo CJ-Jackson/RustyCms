@@ -166,3 +166,27 @@
 .pre {
     @apply tint-bg rounded text-wrap p-4 mb-2;
 }
+
+.file-attachment-flex {
+    @apply flex mb-3 flex-wrap;
+
+    .file-attachment {
+        @apply flex-1 tint-bg rounded-2xl m-2 p-3 w-3xs;
+
+        .label {
+            @apply font-bold text-xs;
+        }
+
+        .icon {
+            @apply inline-block ml-2 size-5! cursor-pointer;
+        }
+    }
+}
+
+.upload-form {
+    @apply flex mb-3 flex-wrap;
+
+    .upload-form-file {
+        @apply flex-1 tint-bg rounded-2xl m-2 p-3 w-3xs;
+    }
+}

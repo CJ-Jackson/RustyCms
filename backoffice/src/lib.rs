@@ -14,6 +14,7 @@ use crate::user::role::visitor_only::visitor_redirect;
 use crate::user::route::login::login_route;
 use crate::user::route::user::{USER_ROUTE, user_route};
 use error_stack::{Report, ResultExt};
+use poem::endpoint::StaticFilesEndpoint;
 use poem::listener::TcpListener;
 use poem::middleware::{CatchPanic, CookieJarManager, Csrf};
 use poem::session::{CookieConfig, CookieSession};
@@ -31,6 +32,8 @@ pub mod export {
     pub use shared::utils::log::init_log;
 }
 
+pub const FILES_ROUTE: &str = "/files";
+
 pub async fn boot() -> Result<(), Report<MainError>> {
     let config = Config::fetch()
         .await
@@ -47,6 +50,10 @@ pub async fn boot() -> Result<(), Report<MainError>> {
         .nest(
             EMBED_PATH,
             enforce_min_js_on_prod(AssetFilesEndPoint::new()),
+        )
+        .nest(
+            FILES_ROUTE,
+            StaticFilesEndpoint::new(config.upgrade().expect("Config Upgrade").file_path.clone()),
         );
 
     let route = route

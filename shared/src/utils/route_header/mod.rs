@@ -10,13 +10,13 @@ pub struct RouteHeader {
 }
 
 impl RouteHeader {
-    pub fn new<E>(header_name: String, default_route: E) -> Self
+    pub fn new<E>(header_name: &str, default_route: E) -> Self
     where
         E: IntoEndpoint,
         E::Endpoint: 'static,
     {
         Self {
-            header_name,
+            header_name: header_name.to_string(),
             default_route: default_route.into_endpoint().map_to_response().boxed(),
             routes: HashMap::new(),
         }
@@ -33,7 +33,7 @@ impl RouteHeader {
     }
 }
 
-pub fn route_header<E>(header_name: String, default_route: E) -> RouteHeader
+pub fn route_header<E>(header_name: &str, default_route: E) -> RouteHeader
 where
     E: IntoEndpoint,
     E::Endpoint: 'static,

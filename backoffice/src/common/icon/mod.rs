@@ -55,3 +55,7 @@ pub fn exclamation_circle_icon() -> Markup {
 pub fn newspaper_icon() -> Markup {
     get_icon("icon/newspaper.svg")
 }
+
+pub fn link_icon() -> Markup {
+    get_icon("icon/link.svg")
+}

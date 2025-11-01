@@ -14,7 +14,7 @@ shared = { path = "./shared" }
 
 thiserror = "2.0.17"
 error-stack = "0.6.0"
-poem = { version = "3.1.12", features = ["cookie", "session", "csrf", "i18n", "embed", "multipart"] }
+poem = { version = "3.1.12", features = ["cookie", "session", "csrf", "i18n", "embed", "multipart", "static-files"] }
 chrono = { version = "0.4.42", features = ["serde"] }
 serde = { version = "1.0.228", features = ["derive", "rc"] }
 serde_json = "1.0.145"

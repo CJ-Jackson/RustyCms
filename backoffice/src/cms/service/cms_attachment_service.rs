@@ -90,7 +90,7 @@ impl CmsAttachmentService {
             .attach(poem::http::StatusCode::INTERNAL_SERVER_ERROR)?;
 
         self.cms_repository
-            .delete_file_attachment(component_id)
+            .delete_file_attachment_by_component_id(component_id)
             .change_context(CmsAttachmentServiceError::DbError)
             .attach(poem::http::StatusCode::INTERNAL_SERVER_ERROR)?;
 

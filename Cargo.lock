@@ -1557,6 +1557,7 @@ dependencies = [
  "hex",
  "http",
  "http-body-util",
+ "httpdate",
  "hyper",
  "hyper-util",
  "intl-memoizer",
