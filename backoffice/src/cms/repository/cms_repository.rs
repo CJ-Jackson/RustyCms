@@ -297,7 +297,11 @@ impl CmsRepository {
         Ok(row)
     }
 
-    pub fn get_file_path(&self, id: i64) -> Result<Option<FilePath>, Report<CmsRepositoryError>> {
+    pub fn get_file_path(
+        &self,
+        id: i64,
+        component_id: i64,
+    ) -> Result<Option<FilePath>, Report<CmsRepositoryError>> {
         let conn = self.borrow_conn()?;
 
         let mut stmt = conn
@@ -309,7 +313,8 @@ impl CmsRepository {
         let row: Option<FilePath> = stmt
             .query_one(
                 named_params! {
-                    ":id": id
+                    ":id": id,
+                    ":component_id": component_id,
                 },
                 |row| Ok(FilePath(row.get("file_path")?)),
             )
@@ -468,6 +473,7 @@ impl CmsRepository {
             named_params! {
                 ":id": update_component_position_model.id,
                 ":position": update_component_position_model.position,
+                ":page_id": update_component_position_model.page_id,
             },
         )
         .change_context(CmsRepositoryError::QueryError)

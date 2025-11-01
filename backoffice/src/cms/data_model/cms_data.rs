@@ -94,6 +94,7 @@ pub struct UpdateComponentModel<T: ComponentDataMarker = Vec<u8>> {
 pub struct UpdateComponentPositionModel {
     pub id: i64,
     pub position: i64,
+    pub page_id: i64,
 }
 
 #[derive(Debug)]

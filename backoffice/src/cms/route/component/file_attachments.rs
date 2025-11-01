@@ -18,6 +18,7 @@ use poem::{IntoResponse, get, handler};
 use shared::cms::components::file_attachments::FileAttachmentsComponent;
 use shared::cms::markers::ComponentInfoMarker;
 use shared::utils::context::Dep;
+use shared::utils::csrf::csrf_header_check_strict;
 use shared::utils::error::FromErrorStack;
 use shared::utils::flash::Flash;
 use shared::utils::query_string::form::FormQs;
@@ -153,7 +154,7 @@ async fn file_attachments_component_delete(
     HeaderId(id): HeaderId,
 ) -> poem::Result<Markup> {
     cms_attachment_service
-        .delete_file_by_id(id as i64)
+        .delete_file_by_id(id as i64, query.id as i64)
         .map_err(poem::Error::from_error_stack)?;
 
     let file_list = cms_attachment_service
@@ -175,8 +176,8 @@ pub fn file_attachments_registry_item() -> ComponentMethods {
         update_fetch: get(route_header("X-Route", file_attachments_component_fetch)
             .at("form", file_attachments_component_fetch_form)
             .at("form-field", file_attachments_component_fetch_form_field))
-        .patch(file_attachments_component_update)
-        .post(file_attachments_component_upload)
-        .delete(file_attachments_component_delete),
+        .patch(csrf_header_check_strict(file_attachments_component_update))
+        .post(csrf_header_check_strict(file_attachments_component_upload))
+        .delete(csrf_header_check_strict(file_attachments_component_delete)),
     }
 }

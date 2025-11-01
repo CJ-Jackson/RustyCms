@@ -80,12 +80,14 @@ impl CmsPageService {
     pub fn update_component_position(
         &self,
         component_position_form: &ComponentPositionForm,
+        page_id: i64,
     ) -> Result<(), Report<CmsPageServiceError>> {
         for (component_id, position) in component_position_form.mapping.iter() {
             self.cms_repository
                 .update_component_position(UpdateComponentPositionModel {
                     id: *component_id as i64,
                     position: *position as i64,
+                    page_id,
                 })
                 .change_context(CmsPageServiceError::DbError)?;
         }

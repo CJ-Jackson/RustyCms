@@ -102,10 +102,14 @@ impl CmsAttachmentService {
         Ok(())
     }
 
-    pub fn delete_file_by_id(&self, id: i64) -> Result<(), Report<CmsAttachmentServiceError>> {
+    pub fn delete_file_by_id(
+        &self,
+        id: i64,
+        component_id: i64,
+    ) -> Result<(), Report<CmsAttachmentServiceError>> {
         let file = self
             .cms_repository
-            .get_file_path(id)
+            .get_file_path(id, component_id)
             .change_context(CmsAttachmentServiceError::DbError)
             .attach(poem::http::StatusCode::INTERNAL_SERVER_ERROR)?
             .ok_or_else(|| {

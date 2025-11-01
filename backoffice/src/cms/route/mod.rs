@@ -249,7 +249,7 @@ async fn cms_update_position(
         .map_err(poem::Error::from_error_stack)?;
 
     cms_page_service
-        .update_component_position(&component_position_form)
+        .update_component_position(&component_position_form, page_id as i64)
         .map_err(poem::Error::from_error_stack)?;
 
     let list_component_model = cms_page_service
