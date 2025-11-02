@@ -1,4 +1,4 @@
-use crate::cms::extractor::HeaderId;
+use crate::cms::extractor::HeaderDeleteId;
 use crate::cms::form::component_form::common_label_form::CommonLabelForm;
 use crate::cms::html_partial::file_attachments_html_partial::{
     file_attachments_form_field_partial, file_attachments_form_partial,
@@ -151,7 +151,7 @@ async fn file_attachments_component_upload(
 async fn file_attachments_component_delete(
     query: UpdateFetchQuery,
     Dep(cms_attachment_service): Dep<CmsAttachmentService>,
-    HeaderId(id): HeaderId,
+    HeaderDeleteId(id): HeaderDeleteId,
 ) -> poem::Result<Markup> {
     cms_attachment_service
         .delete_file_by_id(id as i64, query.id as i64)
