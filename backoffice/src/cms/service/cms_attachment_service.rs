@@ -1,5 +1,6 @@
 use crate::cms::data_model::cms_data::{AddFileAttachmentModel, ListFileAttachmentModel};
 use crate::cms::repository::cms_repository::CmsRepository;
+use crate::user::pointer::user_pointer::UserPointer;
 use chrono::{DateTime, Utc};
 use error_stack::{Report, ResultExt};
 use poem::web::Field;
@@ -22,16 +23,22 @@ pub enum CmsAttachmentServiceError {
 pub struct CmsAttachmentService {
     file_upload_path: String,
     cms_repository: CmsRepository,
+    user_pointer: UserPointer,
     stamp: DateTime<Utc>,
 }
 
 impl CmsAttachmentService {
     const SAVE_PATH: &'static str = "/cms/files";
 
-    pub fn new(file_upload_path: String, cms_repository: CmsRepository) -> Self {
+    pub fn new(
+        file_upload_path: String,
+        cms_repository: CmsRepository,
+        user_pointer: UserPointer,
+    ) -> Self {
         Self {
             file_upload_path,
             cms_repository,
+            user_pointer,
             stamp: Utc::now(),
         }
     }
@@ -44,9 +51,10 @@ impl CmsAttachmentService {
         let file_name = field.file_name().unwrap_or_default().to_string();
         let file_type = field.content_type().unwrap_or_default().to_string();
         let file_path = format!(
-            "{}/{}/{}",
+            "{}/{}-{}/{}",
             Self::SAVE_PATH,
             self.stamp.format("%Y-%m-%d-%s"),
+            self.user_pointer.id,
             &file_name
         );
         let save_file_path = format!("{}/{}", &self.file_upload_path, &file_path);
@@ -145,6 +153,10 @@ impl CmsAttachmentService {
 impl FromContext for CmsAttachmentService {
     async fn from_context(ctx: &'_ Context<'_>) -> Result<Self, Report<ContextError>> {
         let config: ConfigPointer = ctx.inject().await?;
-        Ok(Self::new(config.file_path.clone(), ctx.inject().await?))
+        Ok(Self::new(
+            config.file_path.clone(),
+            ctx.inject().await?,
+            ctx.inject().await?,
+        ))
     }
 }
