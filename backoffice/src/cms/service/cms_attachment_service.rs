@@ -1,5 +1,6 @@
 use crate::cms::data_model::cms_data::{AddFileAttachmentModel, ListFileAttachmentModel};
 use crate::cms::repository::cms_repository::CmsRepository;
+use chrono::{DateTime, Utc};
 use error_stack::{Report, ResultExt};
 use poem::web::Field;
 use shared::utils::config::ConfigPointer;
@@ -21,6 +22,7 @@ pub enum CmsAttachmentServiceError {
 pub struct CmsAttachmentService {
     file_upload_path: String,
     cms_repository: CmsRepository,
+    stamp: DateTime<Utc>,
 }
 
 impl CmsAttachmentService {
@@ -30,6 +32,7 @@ impl CmsAttachmentService {
         Self {
             file_upload_path,
             cms_repository,
+            stamp: Utc::now(),
         }
     }
 
@@ -43,7 +46,7 @@ impl CmsAttachmentService {
         let file_path = format!(
             "{}/{}/{}",
             Self::SAVE_PATH,
-            chrono::Utc::now().format("%Y/%m"),
+            self.stamp.format("%Y-%m-%d-%s"),
             &file_name
         );
         let save_file_path = format!("{}/{}", &self.file_upload_path, &file_path);
