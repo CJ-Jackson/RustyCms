@@ -1,4 +1,3 @@
-use crate::cms::extractor::HeaderDeleteId;
 use crate::cms::form::component_form::common_label_form::CommonLabelForm;
 use crate::cms::html_partial::file_attachments_html_partial::{
     file_attachments_form_field_partial, file_attachments_form_partial,
@@ -10,6 +9,7 @@ use crate::cms::query_model::{CreateQuery, UpdateFetchQuery};
 use crate::cms::service::cms_attachment_service::CmsAttachmentService;
 use crate::cms::service::cms_page_service::CmsPageService;
 use crate::cms::service::component_service::common_label_service::CommonLabelService;
+use crate::common::extractor::HeaderDeleteId;
 use crate::common::html::flash_partial::flash_partial;
 use maud::{Markup, html};
 use poem::i18n::Locale;

@@ -1,6 +1,5 @@
 pub mod data_model;
 pub mod enums;
-pub mod extractor;
 pub mod form;
 pub mod html_partial;
 pub mod methods;
