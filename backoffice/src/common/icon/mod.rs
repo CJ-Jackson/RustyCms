@@ -62,3 +62,7 @@ pub fn link_icon() -> Markup {
 pub fn arrow_path() -> Markup {
     get_icon("icon/arrow_path.svg")
 }
+
+pub fn minus_icon() -> Markup {
+    get_icon("icon/minus.svg")
+}

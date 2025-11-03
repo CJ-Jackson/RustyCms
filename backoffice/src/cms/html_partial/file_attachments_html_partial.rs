@@ -1,7 +1,7 @@
 use crate::FILES_ROUTE;
 use crate::cms::data_model::cms_data::ListFileAttachmentModel;
 use crate::cms::query_model::UpdateFetchQuery;
-use crate::common::icon::{arrow_path, link_icon, plus_icon, trash_icon};
+use crate::common::icon::{arrow_path, link_icon, minus_icon, plus_icon, trash_icon};
 use maud::{Markup, html};
 use serde_json::json;
 use std::sync::Arc;
@@ -40,31 +40,32 @@ pub fn file_attachments_list_partial(
                     }
                 }
             }
-            span hx-get=(update_fetch_query.as_uri()) hx-headers=(json!({"X-Route": "form"})) hx-trigger="load" {}
+            span hx-get=(update_fetch_query.as_uri()) hx-headers=(json!({"X-Route": "form"})) hx-trigger="load" hx-swap="outerHTML" {}
         }
     }
 }
 
 pub fn file_attachments_form_partial(update_fetch_query: &UpdateFetchQuery) -> Markup {
-    let form_field = file_attachments_form_field_partial();
     html! {
-        div .float-right {
-            a class="inline-block ml-2 size-5! cursor-pointer" x-init="await resetTemplate($el)"
-            data-target-id=((format!("file-attachment-form-{}", update_fetch_query.id)))
-            data-template=(form_field.clone().into_string()) title="Reset" { (arrow_path()) }
-
-            a class="inline-block ml-2 size-5! cursor-pointer" x-init="await appendTemplate($el)"
-            data-target-id=((format!("file-attachment-form-{}", update_fetch_query.id)))
-            data-template=(form_field.clone().into_string()) title="Add File Field" { (plus_icon()) }
-        }
-        h5 { "Upload Files" }
-        form .form hx-post=(update_fetch_query.as_uri()) hx-target=(format!("#file-attachment-list-{}", update_fetch_query.id))
-        hx-swap="outerHTML" hx-encoding="multipart/form-data" {
-            div .upload-form id=(format!("file-attachment-form-{}", update_fetch_query.id)) {
-                (form_field)
+        div x-cloak x-data=(json!({"count": 1})) {
+            div .flex {
+                h5 class="basis-1/3" { "Upload Files" }
+                div class="basis-2/3 text-right" {
+                    a class="inline-block ml-2 size-5! cursor-pointer" x-on:click="count=1" title="Reset" { (arrow_path()) }
+                    a class="inline-block ml-2 size-5! cursor-pointer" x-on:click="if(count>1){count--}" title="Remove File Field" { (minus_icon()) }
+                    a class="inline-block ml-2 size-5! cursor-pointer" x-on:click="count++" title="Add File Field" { (plus_icon()) }
+                }
             }
+            form .form hx-post=(update_fetch_query.as_uri()) hx-target=(format!("#file-attachment-list-{}", update_fetch_query.id))
+            hx-swap="outerHTML" hx-encoding="multipart/form-data" {
+                div .upload-form {
+                    template x-for="i in count" {
+                        (file_attachments_form_field_partial())
+                    }
+                }
 
-            button .btn .btn-sky-blue .mt-3 type="submit" { "Upload Files" }
+                button .btn .btn-sky-blue .mt-3 type="submit" { "Upload Files" }
+            }
         }
     }
 }
