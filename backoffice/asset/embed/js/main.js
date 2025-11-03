@@ -1,4 +1,5 @@
 import htmx from './lib/htmx/htmx.esm.js'
+import Alpine from './lib/alpine/alpine.esm.js'
 
 async function stub() {
 }
@@ -28,21 +29,21 @@ async function clearNavActive() {
     }
 }
 
-function addNavActive() {
-    let tagUpdateElement = document.getElementById("tag-update");
-    if (tagUpdateElement !== null) {
-        clearNavActive().then(function () {
-            if (tagUpdateElement.dataset.tag === undefined || tagUpdateElement.dataset.tag === "") {
-                return;
-            }
-            let tagElement = document.getElementById(tagUpdateElement.dataset.tag);
-            if (tagElement !== null) {
-                tagElement.classList.add("nav-item-active");
-            }
-        }).then(function () {
-            tagUpdateElement.remove();
-        });
-    }
+/**
+ * @param {HTMLElement} tagUpdateElement
+ */
+async function addNavActiveAlpine(tagUpdateElement) {
+    clearNavActive().then(function () {
+        if (tagUpdateElement.dataset.tag === undefined || tagUpdateElement.dataset.tag === "") {
+            return;
+        }
+        let tagElement = document.getElementById(tagUpdateElement.dataset.tag);
+        if (tagElement !== null) {
+            tagElement.classList.add("nav-item-active");
+        }
+    }).then(function () {
+        tagUpdateElement.remove();
+    });
 }
 
 let token = "";
@@ -88,7 +89,6 @@ function getCsrfToken() {
 export function start() {
     htmx.onLoad(function () {
         formatToLocalTime();
-        addNavActive();
         refreshCsrfToken();
     });
 
@@ -125,4 +125,7 @@ export function start() {
     });
 
     window.csrfToken = getCsrfToken;
+    window.Alpine = Alpine;
+    window.addNavActiveAlpine = addNavActiveAlpine;
+    Alpine.start();
 }
