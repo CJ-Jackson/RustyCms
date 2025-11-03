@@ -49,8 +49,8 @@ pub fn file_attachments_form_partial(update_fetch_query: &UpdateFetchQuery) -> M
     html! {
         div x-cloak x-data=(json!({"count": 1})) {
             div .flex {
-                h5 class="basis-1/3" { "Upload Files" }
-                div class="basis-2/3 text-right" {
+                h5 class="basis-1/2" { "Upload Files" }
+                div class="basis-1/2 text-right" {
                     a class="inline-block ml-2 size-5! cursor-pointer" x-on:click="count=1" title="Reset" { (arrow_path()) }
                     a class="inline-block ml-2 size-5! cursor-pointer" x-on:click="if(count>1){count--}" title="Remove File Field" { (minus_icon()) }
                     a class="inline-block ml-2 size-5! cursor-pointer" x-on:click="count++" title="Add File Field" { (plus_icon()) }
