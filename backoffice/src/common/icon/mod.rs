@@ -59,7 +59,7 @@ pub fn newspaper_icon() -> Markup {
 pub fn link_icon() -> Markup {
     get_icon("icon/link.svg")
 }
-pub fn arrow_path() -> Markup {
+pub fn arrow_path_icon() -> Markup {
     get_icon("icon/arrow_path.svg")
 }
 

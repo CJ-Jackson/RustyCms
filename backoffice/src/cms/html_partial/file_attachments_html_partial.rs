@@ -1,7 +1,7 @@
 use crate::FILES_ROUTE;
 use crate::cms::data_model::cms_data::ListFileAttachmentModel;
 use crate::cms::query_model::UpdateFetchQuery;
-use crate::common::icon::{arrow_path, link_icon, minus_icon, plus_icon, trash_icon};
+use crate::common::icon::{arrow_path_icon, link_icon, minus_icon, plus_icon, trash_icon};
 use maud::{Markup, html};
 use serde_json::json;
 use std::sync::Arc;
@@ -51,7 +51,7 @@ pub fn file_attachments_form_partial(update_fetch_query: &UpdateFetchQuery) -> M
             div .flex {
                 h5 class="basis-1/2" { "Upload Files" }
                 div class="basis-1/2 text-right" {
-                    a class="inline-block ml-2 size-5! cursor-pointer" x-on:click="count=1" title="Reset" { (arrow_path()) }
+                    a class="inline-block ml-2 size-5! cursor-pointer" x-on:click="count=1" title="Reset" { (arrow_path_icon()) }
                     a class="inline-block ml-2 size-5! cursor-pointer" x-on:click="if(count>1){count--}" title="Remove File Field" { (minus_icon()) }
                     a class="inline-block ml-2 size-5! cursor-pointer" x-on:click="count++" title="Add File Field" { (plus_icon()) }
                 }
