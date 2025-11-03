@@ -1,7 +1,6 @@
 use crate::cms::form::component_form::common_label_form::CommonLabelForm;
 use crate::cms::html_partial::file_attachments_html_partial::{
-    file_attachments_form_field_partial, file_attachments_form_partial,
-    file_attachments_list_partial,
+    file_attachments_form_partial, file_attachments_list_partial,
 };
 use crate::cms::html_partial::positions_partial;
 use crate::cms::methods::ComponentMethods;
@@ -78,13 +77,6 @@ async fn file_attachments_component_fetch(
 async fn file_attachments_component_fetch_form(query: UpdateFetchQuery) -> Markup {
     html! {
         (file_attachments_form_partial(&query))
-    }
-}
-
-#[handler]
-async fn file_attachments_component_fetch_form_field() -> Markup {
-    html! {
-        (file_attachments_form_field_partial())
     }
 }
 
@@ -174,8 +166,7 @@ pub fn file_attachments_registry_item() -> ComponentMethods {
         info: FileAttachmentsComponent::component_info(),
         create: get(file_attachments_component_create),
         update_fetch: get(route_header("X-Route", file_attachments_component_fetch)
-            .at("form", file_attachments_component_fetch_form)
-            .at("form-field", file_attachments_component_fetch_form_field))
+            .at("form", file_attachments_component_fetch_form))
         .patch(csrf_header_check_strict(file_attachments_component_update))
         .post(csrf_header_check_strict(file_attachments_component_upload))
         .delete(csrf_header_check_strict(file_attachments_component_delete)),

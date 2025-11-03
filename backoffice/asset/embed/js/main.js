@@ -77,6 +77,44 @@ function getCsrfToken() {
     return token;
 }
 
+/**
+ * @param {HTMLElement} element
+ * @returns {Promise<void>}
+ */
+async function appendTemplate(element) {
+    element.addEventListener("click", function (el) {
+        el.preventDefault();
+        let targetId = this.dataset.targetId;
+        let template = this.dataset.template;
+
+        let target = document.getElementById(targetId);
+        if (target === null) {
+            return;
+        }
+        let templateElement = document.createElement("div");
+        templateElement.innerHTML = template;
+        target.appendChild(templateElement.firstChild);
+    });
+}
+
+/**
+ * @param {HTMLElement} element
+ * @returns {Promise<void>}
+ */
+async function resetTemplate(element) {
+    element.addEventListener("click", function (el) {
+        el.preventDefault();
+        let targetId = this.dataset.targetId;
+        let template = this.dataset.template;
+
+        let target = document.getElementById(targetId);
+        if (target === null) {
+            return;
+        }
+        target.innerHTML = template;
+    });
+}
+
 export function start() {
     htmx.onLoad(function () {
         refreshCsrfToken();
@@ -115,8 +153,11 @@ export function start() {
     });
 
     window.csrfToken = getCsrfToken;
-    window.Alpine = Alpine;
     window.updateNavActive = updateNavActive;
     window.formatToLocalTime = formatToLocalTime;
+    window.appendTemplate = appendTemplate;
+    window.resetTemplate = resetTemplate;
+
+    window.Alpine = Alpine;
     Alpine.start();
 }
