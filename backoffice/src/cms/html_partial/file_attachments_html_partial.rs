@@ -57,7 +57,7 @@ pub fn file_attachments_form_partial(update_fetch_query: &UpdateFetchQuery) -> M
                 }
             }
             form .form hx-post=(update_fetch_query.as_uri()) hx-target=(format!("#file-attachment-list-{}", update_fetch_query.id))
-            hx-swap="outerHTML" hx-encoding="multipart/form-data" {
+                hx-swap="outerHTML" hx-encoding="multipart/form-data" {
                 div .upload-form {
                     template x-for="i in count" {
                         (file_attachments_form_field_partial())
