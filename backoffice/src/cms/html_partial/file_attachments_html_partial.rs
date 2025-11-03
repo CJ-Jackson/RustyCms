@@ -26,7 +26,7 @@ pub fn file_attachments_list_partial(
                             div .label .mt-1 { "File Type:" }
                             (file.file_type.clone())
                             div .label .mt-1 { "Uploaded At:" }
-                            span .js-date-local { (file.uploaded.to_rfc3339()) }
+                            span x-init="await formatToLocalTime($el)" { (file.uploaded.to_rfc3339()) }
 
                             div .text-right .mt-2 {
                                 a .file-attachment-delete .icon hx-delete=(update_fetch_query.as_uri()) hx-confirm="Are you sure?"

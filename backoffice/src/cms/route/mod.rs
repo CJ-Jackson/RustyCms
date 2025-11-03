@@ -67,9 +67,9 @@ async fn cms_list_page(
                             td { (page.id) }
                             td { (page.author) }
                             td { (page.title) }
-                            td .js-date-local { (page.added.to_rfc3339()) }
+                            td x-init="await formatToLocalTime($el)" { (page.added.to_rfc3339()) }
                             @if let Some(updated) = page.updated.as_ref() {
-                                td .js-date-local { (updated.to_rfc3339()) }
+                                td x-init="await formatToLocalTime($el)" { (updated.to_rfc3339()) }
                             } @else {
                                 td { "N/A" }
                             }
