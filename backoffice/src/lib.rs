@@ -53,7 +53,9 @@ pub async fn boot() -> Result<(), Report<MainError>> {
         )
         .nest(
             FILES_ROUTE,
-            StaticFilesEndpoint::new(config.upgrade().expect("Config Upgrade").file_path.clone()),
+            must_be_user(StaticFilesEndpoint::new(
+                config.upgrade().expect("Config Upgrade").file_path.clone(),
+            )),
         );
 
     let route = route
