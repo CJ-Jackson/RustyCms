@@ -19,7 +19,7 @@ impl Flash {
             Self::Success { msg } => {
                 html! {
                    div .flash-message .flash-message-success
-                        x-data=(js_data) x-init="hide()"
+                        x-data=(js_data) x-init="start()"
                         x-show="show" "x-transition.duration.400ms" {
                        (msg)
                    }
@@ -28,7 +28,7 @@ impl Flash {
             Self::Error { msg } => {
                 html! {
                    div .flash-message .flash-message-error
-                        x-data=(js_data) x-init="hide()"
+                        x-data=(js_data) x-init="start()"
                         x-show="show" "x-transition.duration.400ms" {
                        (msg)
                    }
@@ -37,7 +37,7 @@ impl Flash {
             Self::Warning { msg } => {
                 html! {
                    div .flash-message .flash-message-warning
-                        x-data=(js_data) x-init="hide()"
+                        x-data=(js_data) x-init="start()"
                         x-show="show" "x-transition.duration.400ms" {
                        (msg)
                    }

@@ -46,14 +46,15 @@ pub fn file_attachments_list_partial(
 }
 
 pub fn file_attachments_form_partial(update_fetch_query: &UpdateFetchQuery) -> Markup {
+    let js_data = include_str!("_js/file_attachment_form_data.js");
     html! {
-        div x-cloak x-data=(json!({"count": 1})) {
+        div x-cloak x-data=(js_data) {
             div .flex {
                 h5 class="basis-1/2" { "Upload Files" }
                 div class="basis-1/2 text-right" {
-                    a class="inline-block ml-2 size-5! cursor-pointer" x-on:click="count=1" title="Reset" { (arrow_path_icon()) }
-                    a class="inline-block ml-2 size-5! cursor-pointer" x-on:click="if(count>1){count--}" title="Remove File Field" { (minus_icon()) }
-                    a class="inline-block ml-2 size-5! cursor-pointer" x-on:click="count++" title="Add File Field" { (plus_icon()) }
+                    a class="inline-block ml-2 size-5! cursor-pointer" x-show="show" x-on:click="reset()" title="Reset" { (arrow_path_icon()) }
+                    a class="inline-block ml-2 size-5! cursor-pointer" x-show="show" x-on:click="remove()" title="Remove File Field" { (minus_icon()) }
+                    a class="inline-block ml-2 size-5! cursor-pointer" x-on:click="add()" title="Add File Field" { (plus_icon()) }
                 }
             }
             form .form hx-post=(update_fetch_query.as_uri()) hx-target=(format!("#file-attachment-list-{}", update_fetch_query.id))

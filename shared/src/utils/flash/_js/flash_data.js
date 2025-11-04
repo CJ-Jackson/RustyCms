@@ -1,5 +1,6 @@
 ({
-    show: true, hide() {
+    show: true,
+    start() {
         setTimeout(() => {
             this.show = false;
             setTimeout(() => {
