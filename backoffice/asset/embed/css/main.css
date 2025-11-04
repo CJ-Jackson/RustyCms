@@ -379,7 +379,7 @@
   }
 }
 [x-cloak] {
-  display: none;
+  display: none !important;
 }
 .body {
   background-color: var(--color-white);
