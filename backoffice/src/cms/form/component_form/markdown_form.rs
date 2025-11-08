@@ -48,30 +48,34 @@ impl MarkdownForm {
 
         html! {
             form .mb-3 .form hx-patch=(query.as_uri()) hx-swap="outerHTML" {
-                div .form-group id=(format!("label-group-{}", query.id)) {
+                div .form-group {
                     label .label for=(format!("label-group-label-{}", query.id)) { "Label" }
                     input id=(format!("label-group-label-{}", query.id)) .form-item .w-full type="text" name="label" value=(self.label)
                         placeholder="Label"
                         hx-patch=(query.as_uri())
                         hx-trigger="change"
                         hx-swap="outerHTML"
-                        hx-target=(format!("#label-group-{}", query.id))
-                        hx-select=(format!("#label-group-{}", query.id))
+                        hx-target=(format!("#label-error-group-{}", query.id))
+                        hx-select=(format!("#label-error-group-{}", query.id))
                         {}
-                    (errors.label.into_error_html())
+                    span id=(format!("label-error-group-{}", query.id)) {
+                        (errors.label.into_error_html())
+                    }
                 }
-                div .form-group id=(format!("markdown-group-{}", query.id)) {
+                div .form-group {
                     label .label for=(format!("markdown-group-label-{}", query.id)) { "Markdown" }
                     textarea id=(format!("markdown-group-label-{}", query.id)) .form-item .w-full name="markdown"
                         hx-patch=(query.as_uri())
                         hx-swap="outerHTML"
                         hx-trigger="change"
-                        hx-target=(format!("#markdown-group-{}", query.id))
-                        hx-select=(format!("#markdown-group-{}", query.id))
+                        hx-target=(format!("#markdown-error-group-{}", query.id))
+                        hx-select=(format!("#markdown-error-group-{}", query.id))
                         {
                             (self.markdown)
                         }
-                    (errors.markdown.into_error_html())
+                    span id=(format!("markdown-error-group-{}", query.id)) {
+                        (errors.markdown.into_error_html())
+                    }
                 }
             }
         }
