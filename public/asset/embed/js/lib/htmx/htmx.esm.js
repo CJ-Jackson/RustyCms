@@ -5901,11 +5901,20 @@ var htmx = (function () {
         },
         handleSwap: function (swapStyle, target, fragment) {
             if (swapStyle === "morph") {
+                let option = {
+                    updating(el, toEl, childrenOnly, skip) {
+                        if (el.dataset && el.dataset.morphChildrenOnly === 'true') {
+                            return childrenOnly();
+                        } else if (el.dataset && el.dataset.morphIgnore === 'true') {
+                            return skip();
+                        }
+                    },
+                };
                 if (fragment.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-                    Alpine.morph(target, fragment.firstElementChild);
+                    Alpine.morph(target, fragment.firstElementChild, option);
                     return [target];
                 } else {
-                    Alpine.morph(target, fragment.outerHTML);
+                    Alpine.morph(target, fragment.outerHTML, option);
                     return [target];
                 }
             }
