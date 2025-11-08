@@ -47,33 +47,21 @@ impl MarkdownForm {
         let errors = errors.unwrap_or_default();
 
         html! {
-            form .mb-3 .form hx-patch=(query.as_uri()) hx-swap="outerHTML" {
+            form .mb-3 .form hx-patch=(query.as_uri()) hx-target="this" hx-ext="alpine-morph" hx-swap="morph" hx-trigger="change" {
                 div .form-group {
                     label .label for=(format!("label-group-label-{}", query.id)) { "Label" }
                     input id=(format!("label-group-label-{}", query.id)) .form-item .w-full type="text" name="label" value=(self.label)
-                        placeholder="Label"
-                        hx-patch=(query.as_uri())
-                        hx-trigger="change"
-                        hx-swap="outerHTML"
-                        hx-target=(format!("#label-error-group-{}", query.id))
-                        hx-select=(format!("#label-error-group-{}", query.id))
-                        {}
-                    span id=(format!("label-error-group-{}", query.id)) {
+                        placeholder="Label" {}
+                    span {
                         (errors.label.into_error_html())
                     }
                 }
                 div .form-group {
                     label .label for=(format!("markdown-group-label-{}", query.id)) { "Markdown" }
-                    textarea id=(format!("markdown-group-label-{}", query.id)) .form-item .w-full name="markdown"
-                        hx-patch=(query.as_uri())
-                        hx-swap="outerHTML"
-                        hx-trigger="change"
-                        hx-target=(format!("#markdown-error-group-{}", query.id))
-                        hx-select=(format!("#markdown-error-group-{}", query.id))
-                        {
-                            (self.markdown)
-                        }
-                    span id=(format!("markdown-error-group-{}", query.id)) {
+                    textarea id=(format!("markdown-group-label-{}", query.id)) .form-item .w-full name="markdown" {
+                        (self.markdown)
+                    }
+                    span {
                         (errors.markdown.into_error_html())
                     }
                 }

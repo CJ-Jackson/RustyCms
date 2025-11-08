@@ -42,12 +42,14 @@ impl CommonLabelForm {
         let errors = errors.unwrap_or_default();
 
         html! {
-            form .mb-3 .form hx-patch=(query.as_uri()) hx-swap="outerHTML" hx-trigger="change" {
+            form .mb-3 .form hx-patch=(query.as_uri()) hx-target="this" hx-ext="alpine-morph" hx-swap="morph" hx-trigger="change" {
                 div .form-group id=(format!("label-group-{}", query.id)) {
                     label .label for=(format!("label-group-label-{}", query.id)) { "Label" }
                     input id=(format!("label-group-label-{}", query.id)) .form-item .w-full type="text" name="label" value=(self.label)
                         placeholder="Label" {}
-                    (errors.label.into_error_html())
+                    span {
+                        (errors.label.into_error_html())
+                    }
                 }
             }
         }
