@@ -88,6 +88,13 @@ export function start() {
         }
     });
 
+    Alpine.store('loader', {
+        async easymde(options = {}) {
+            let EasyMDEManager = await import('./loaders/easymde.js');
+            return await EasyMDEManager.default.start(options);
+        }
+    });
+
     htmx.on("htmx:responseError", function (evt) {
         if (evt.detail.xhr.status === 422) {
             return;

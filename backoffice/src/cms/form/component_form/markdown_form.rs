@@ -58,8 +58,11 @@ impl MarkdownForm {
                 }
                 div .form-group {
                     label .label for=(format!("markdown-group-label-{}", query.id)) { "Markdown" }
-                    textarea id=(format!("markdown-group-label-{}", query.id)) .form-item .w-full name="markdown" {
-                        (self.markdown)
+                    span data-morph-ignore="true" {
+                        textarea x-data=(include_str!("_js/markdown_component.js")) x-model="value" data-value=(self.markdown)
+                            id=(format!("markdown-group-label-{}", query.id)) .form-item .w-full name="markdown" {
+                            (self.markdown)
+                        }
                     }
                     span {
                         (errors.markdown.into_error_html())
