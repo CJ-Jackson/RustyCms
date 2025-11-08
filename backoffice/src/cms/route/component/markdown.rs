@@ -4,14 +4,16 @@ use crate::cms::methods::ComponentMethods;
 use crate::cms::query_model::{CreateQuery, UpdateFetchQuery};
 use crate::cms::service::cms_page_service::CmsPageService;
 use crate::cms::service::component_service::markdown_component_service::MarkdownComponentService;
+use crate::common::html::partial::command_list_partial;
 use maud::{Markup, html};
 use poem::http::StatusCode;
 use poem::i18n::Locale;
+use poem::web::CsrfToken;
 use poem::{IntoResponse, get, handler};
 use shared::cms::components::markdown::MarkdownComponent;
 use shared::cms::markers::ComponentInfoMarker;
 use shared::utils::context::Dep;
-use shared::utils::csrf::csrf_header_check_strict;
+use shared::utils::csrf::{CsrfTokenHtml, csrf_header_check_strict};
 use shared::utils::error::FromErrorStack;
 use shared::utils::query_string::form::FormQs;
 use std::sync::Arc;
@@ -66,6 +68,7 @@ async fn markdown_component_update(
     Dep(markdown_component_service): Dep<MarkdownComponentService>,
     FormQs(form): FormQs<MarkdownForm>,
     locale: Locale,
+    csrf_token: &CsrfToken,
 ) -> poem::Result<poem::Response> {
     let form_validated = form.as_validated().await.0;
 
@@ -78,6 +81,7 @@ async fn markdown_component_update(
                 (form.as_form_html(&query, None))
                 span id=(format!{"component-position-label-{}", query.id}) hx-swap-oob="true"
                     { (validated.label.as_str()) }
+                (command_list_partial(vec![csrf_token.as_html_command()]))
             }
             .into_response())
         }
@@ -85,6 +89,7 @@ async fn markdown_component_update(
             let message = verror.as_message(&locale);
             Ok(html! {
                 (form.as_form_html(&query, Some(message)))
+                (command_list_partial(vec![csrf_token.as_html_command()]))
             }
             .with_status(StatusCode::UNPROCESSABLE_ENTITY)
             .into_response())

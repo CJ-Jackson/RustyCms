@@ -9,15 +9,15 @@ use crate::cms::service::cms_attachment_service::CmsAttachmentService;
 use crate::cms::service::cms_page_service::CmsPageService;
 use crate::cms::service::component_service::common_label_service::CommonLabelService;
 use crate::common::extractor::HeaderDeleteId;
-use crate::common::html::flash_partial::flash_partial;
+use crate::common::html::partial::{command_list_partial, flash_partial};
 use maud::{Markup, html};
 use poem::i18n::Locale;
-use poem::web::Multipart;
+use poem::web::{CsrfToken, Multipart};
 use poem::{IntoResponse, get, handler};
 use shared::cms::components::file_attachments::FileAttachmentsComponent;
 use shared::cms::markers::ComponentInfoMarker;
 use shared::utils::context::Dep;
-use shared::utils::csrf::csrf_header_check_strict;
+use shared::utils::csrf::{CsrfTokenHtml, csrf_header_check_strict};
 use shared::utils::error::FromErrorStack;
 use shared::utils::flash::Flash;
 use shared::utils::query_string::form::FormQs;
@@ -86,6 +86,7 @@ async fn file_attachments_component_update(
     Dep(common_label_service): Dep<CommonLabelService>,
     FormQs(form): FormQs<CommonLabelForm>,
     locale: Locale,
+    csrf_token: &CsrfToken,
 ) -> poem::Result<poem::Response> {
     let form_validated = form.as_validated().await.0;
 
@@ -98,6 +99,7 @@ async fn file_attachments_component_update(
                 (form.as_form_html(&query, None))
                 span id=(format!{"component-position-label-{}", query.id}) hx-swap-oob="true"
                     { (validated.label.as_str()) }
+                (command_list_partial(vec![csrf_token.as_html_command()]))
             }
             .into_response())
         }
@@ -105,6 +107,7 @@ async fn file_attachments_component_update(
             let message = verror.as_message(&locale);
             Ok(html! {
                 (form.as_form_html(&query, Some(message)))
+                (command_list_partial(vec![csrf_token.as_html_command()]))
             }
             .with_status(poem::http::StatusCode::UNPROCESSABLE_ENTITY)
             .into_response())
@@ -117,6 +120,7 @@ async fn file_attachments_component_upload(
     query: UpdateFetchQuery,
     Dep(cms_attachment_service): Dep<CmsAttachmentService>,
     mut multipart: Multipart,
+    csrf_token: &CsrfToken,
 ) -> poem::Result<Markup> {
     while let Some(file) = multipart.next_field().await? {
         if file.name().unwrap_or_default() == "file" {
@@ -136,6 +140,7 @@ async fn file_attachments_component_upload(
         (flash_partial(Flash::Success {
             msg: "File uploaded successfully".to_string(),
         }))
+        (command_list_partial(vec![csrf_token.as_html_command()]))
     })
 }
 
@@ -144,6 +149,7 @@ async fn file_attachments_component_delete(
     query: UpdateFetchQuery,
     Dep(cms_attachment_service): Dep<CmsAttachmentService>,
     HeaderDeleteId(id): HeaderDeleteId,
+    csrf_token: &CsrfToken,
 ) -> poem::Result<Markup> {
     cms_attachment_service
         .delete_file_by_id(id as i64, query.id as i64)
@@ -158,6 +164,7 @@ async fn file_attachments_component_delete(
         (flash_partial(Flash::Success {
             msg: "File deleted successfully".to_string(),
         }))
+        (command_list_partial(vec![csrf_token.as_html_command()]))
     })
 }
 

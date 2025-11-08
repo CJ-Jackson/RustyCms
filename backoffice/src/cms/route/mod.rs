@@ -8,7 +8,7 @@ use crate::cms::service::cms_attachment_service::CmsAttachmentService;
 use crate::cms::service::cms_page_service::CmsPageService;
 use crate::cms::service::cms_permission_check_service::CmsPermissionCheckService;
 use crate::common::html::context_html::ContextHtmlBuilder;
-use crate::common::html::flash_partial::flash_partial;
+use crate::common::html::partial::{command_list_partial, flash_partial};
 use crate::common::icon::{pencil_square_icon, plus_icon};
 use crate::user::pointer::user_pointer::UserPointer;
 use crate::user::role::Role;
@@ -67,9 +67,9 @@ async fn cms_list_page(
                             td { (page.id) }
                             td { (page.author) }
                             td { (page.title) }
-                            td x-init="await formatToLocalTime($el)" { (page.added.to_rfc3339()) }
+                            td x-init="$store.util.formatToLocalTime($el)" { (page.added.to_rfc3339()) }
                             @if let Some(updated) = page.updated.as_ref() {
-                                td x-init="await formatToLocalTime($el)" { (updated.to_rfc3339()) }
+                                td x-init="$store.util.formatToLocalTime($el)" { (updated.to_rfc3339()) }
                             } @else {
                                 td { "N/A" }
                             }
@@ -77,7 +77,7 @@ async fn cms_list_page(
                             td .action {
                                 @if user_pointer.role == Role::Root || user_pointer.id == page.user_id {
                                     a .icon href=(format!("{}/amend-page/{}", CMS_ROUTE, page.id)) title="Edit"
-                                        hx-get=(format!("{}/amend-page/{}", CMS_ROUTE, page.id)) hx-target="#main-content" hx-push-url="true" {
+                                        hx-boost="true" hx-target="#main-content" hx-push-url="true" {
                                         (edit_icon) }
                                 }
                             }
@@ -87,7 +87,7 @@ async fn cms_list_page(
             }
             div .text-right .mt-3 {
                 a .inline-block href=(format!("{}/create-page", CMS_ROUTE)) title="Create"
-                    hx-get=(format!("{}/create-page", CMS_ROUTE)) hx-target="#main-content" hx-push-url="true" {
+                    hx-boost="true" hx-target="#main-content" hx-push-url="true" {
                     (add_icon) }
             }
         })
@@ -101,7 +101,11 @@ async fn cms_create_page_get(
 ) -> poem::Result<Markup> {
     let add_page_form = AddPageForm::default();
     Ok(add_page_form
-        .as_form_html(&context_html_builder, None, Some(csrf_token.as_html()))
+        .as_form_html(
+            &context_html_builder,
+            None,
+            Some(csrf_token.as_html_input()),
+        )
         .await)
 }
 
@@ -137,7 +141,7 @@ async fn cms_create_page_post(
                 .as_form_html(
                     &context_html_builder,
                     Some(error_message),
-                    Some(csrf_token.as_html()),
+                    Some(csrf_token.as_html_input()),
                 )
                 .await
                 .with_status(StatusCode::UNPROCESSABLE_ENTITY)
@@ -152,6 +156,7 @@ async fn cms_amend_page_get(
     Dep(context_html_builder): Dep<ContextHtmlBuilder>,
     Dep(cms_page_service): Dep<CmsPageService>,
     Dep(cms_permission_check_service): Dep<CmsPermissionCheckService>,
+    csrf_token: &CsrfToken,
 ) -> poem::Result<Markup> {
     cms_permission_check_service
         .check_permission_by_page_id(page_id as i64)
@@ -188,11 +193,14 @@ async fn cms_amend_page_get(
                 div class="basis-1/5" {
                     h3 { "Add Component" }
                     @for item in registry_item().iter() {
-                        span .btn .btn-sky-blue .mb-2 hx-get=(item.as_create_query(page_id).as_uri())
+                        span .btn .btn-sky-blue .mb-2 .cursor-pointer hx-get=(item.as_create_query(page_id).as_uri())
                         hx-target="#components" hx-swap="beforeend" { (item.kind) }
                     }
                 }
             }
+        })
+        .attach_footer(html! {
+            (csrf_token.as_html_command())
         })
         .build())
 }
@@ -243,6 +251,7 @@ async fn cms_update_position(
     Dep(cms_page_service): Dep<CmsPageService>,
     Dep(cms_permission_check_service): Dep<CmsPermissionCheckService>,
     FormQs(component_position_form): FormQs<ComponentPositionForm>,
+    csrf_token: &CsrfToken,
 ) -> poem::Result<Markup> {
     cms_permission_check_service
         .check_permission_by_page_id(page_id as i64)
@@ -262,6 +271,7 @@ async fn cms_update_position(
         (flash_partial(Flash::Success {
             msg: "Updated Positions".to_string()
         }))
+        (command_list_partial(vec![csrf_token.as_html_command()]))
     })
 }
 
@@ -271,6 +281,7 @@ async fn cms_delete_component(
     Dep(cms_page_service): Dep<CmsPageService>,
     Dep(cms_permission_check_service): Dep<CmsPermissionCheckService>,
     Dep(cms_attachment_service): Dep<CmsAttachmentService>,
+    csrf_token: &CsrfToken,
 ) -> poem::Result<Markup> {
     cms_permission_check_service
         .check_permission_by_component_id(component_id as i64)
@@ -294,6 +305,7 @@ async fn cms_delete_component(
         (flash_partial(Flash::Success {
             msg: "Deleted component successfully".to_string()
         }))
+        (command_list_partial(vec![csrf_token.as_html_command()]))
     })
 }
 

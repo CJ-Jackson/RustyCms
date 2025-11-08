@@ -6,9 +6,10 @@ use crate::stack::route::locale::stack_locale::{
 use crate::stack::service::stack_service::StackService;
 use maud::{Markup, html};
 use poem::session::Session;
-use poem::web::{Path, Redirect};
+use poem::web::{CsrfToken, Path, Redirect};
 use poem::{Response, Route, get, handler};
 use shared::utils::context::Dep;
+use shared::utils::csrf::CsrfTokenHtml;
 use shared::utils::error::FromErrorStack;
 use shared::utils::flash::{Flash, FlashMessage};
 use shared::utils::htmx::HtmxHeader;
@@ -19,6 +20,7 @@ pub const STACK_ROUTE: &str = "/stack";
 fn list_error_stack(
     Dep(stack_service): Dep<StackService>,
     Dep(context_html_builder): Dep<ContextHtmlBuilder>,
+    csrf_token: &CsrfToken,
 ) -> Markup {
     let error_stack_list = stack_service.list_error_stack();
     let open_icon = document_magnifying_glass_icon();
@@ -46,10 +48,10 @@ fn list_error_stack(
                             td { (error_stack.id) }
                             td { (error_stack.error_name) }
                             td { (error_stack.error_summary) }
-                            td x-init="await formatToLocalTime($el)" { (error_stack.reported_at.to_rfc3339()) }
+                            td x-init="$store.util.formatToLocalTime($el)" { (error_stack.reported_at.to_rfc3339()) }
                             td .action {
                                 a .icon href=(format!("{}/view/{}", STACK_ROUTE, error_stack.id))
-                                    title=(lc.action_details) hx-get=(format!("{}/view/{}", STACK_ROUTE, error_stack.id))
+                                    title=(lc.action_details) hx-boost="true"
                                     hx-push-url="true" hx-target="#main-content" { (open_icon) }
                             }
                         }
@@ -60,6 +62,9 @@ fn list_error_stack(
                 a .inline-block hx-confirm=(stack_clear_confirm_message(&context_html_builder.locale)) href=(format!("{}/clear", STACK_ROUTE))
                 title=(lc.action_clear) hx-delete=(format!("{}/clear", STACK_ROUTE)) { (clear_icon) }
             }
+        })
+        .attach_footer(html! {
+            (csrf_token.as_html_command())
         })
         .build()
 }
@@ -82,7 +87,7 @@ fn fetch_error_stack_detail(
         .attach_content(html! {
             h1 { (title) }
             h2 { (lc.head_reported) }
-            pre .pre x-init="await formatToLocalTime($el)" { (item.reported_at.to_rfc3339()) }
+            pre .pre x-init="$store.util.formatToLocalTime($el)" { (item.reported_at.to_rfc3339()) }
             h2 { (lc.head_summary) }
             pre .pre { (item.error_summary) }
             h2 { (lc.head_stack) }

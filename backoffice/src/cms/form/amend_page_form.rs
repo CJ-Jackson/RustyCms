@@ -68,7 +68,7 @@ impl AmendPageForm {
                     }
                 }
                 div .form-group {
-                    button .btn .btn-sky-blue type="submit" { "Save Info and Status" }
+                    button .btn .btn-sky-blue .cursor-pointer type="submit" { "Save Info and Status" }
                 }
             }
         }

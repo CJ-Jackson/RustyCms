@@ -1,6 +1,6 @@
 pub mod context_html;
-pub mod flash_partial;
 pub mod locale;
+pub mod partial;
 pub mod validate;
 
 use crate::common::embed::AssetHidden;

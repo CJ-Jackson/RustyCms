@@ -16,13 +16,24 @@ use thiserror::Error;
 pub const CSRF_PATH: &'static str = "/csrf/";
 
 pub trait CsrfTokenHtml {
-    fn as_html(&self) -> Markup;
+    fn as_html_input(&self) -> Markup;
+
+    fn as_html_command(&self) -> Markup;
 }
 
 impl CsrfTokenHtml for CsrfToken {
-    fn as_html(&self) -> Markup {
+    fn as_html_input(&self) -> Markup {
         html! {
-            input type="hidden" name="csrf_token" value=(self.0);
+            input type="hidden" name="csrf_token" value=(self.0)
+                x-data data-csrf=(self.0) x-model="$store.csrf.token"
+                x-init="$store.csrf.updateTokenByElement($el, false)";
+        }
+    }
+
+    fn as_html_command(&self) -> Markup {
+        html! {
+            span hidden x-init="$store.csrf.updateTokenByElement($el)"
+            data-csrf=(self.0) { }
         }
     }
 }

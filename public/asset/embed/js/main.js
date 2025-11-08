@@ -1,54 +1,42 @@
 import htmx from './lib/htmx/htmx.esm.js'
-
-async function stub() {
-}
-
-function formatToLocalTime() {
-    stub().then(function () {
-        let elements = document.getElementsByClassName("js-date-local");
-        for (let element of elements) {
-            let date = new Date(element.innerHTML);
-            if (isNaN(date.getTime()) || date.toString() === "Invalid Date" || date.getTime() === 0) {
-                return;
-            }
-            element.innerHTML = date.toLocaleString();
-        }
-    }).then(function () {
-        let elements = document.getElementsByClassName("js-date-local");
-        for (let element of elements) {
-            element.classList.remove("js-date-local");
-        }
-    })
-}
-
-async function clearNavActive() {
-    let elements = document.getElementsByClassName("nav-item");
-    for (let element of elements) {
-        element.classList.remove("nav-item-active");
-    }
-}
-
-function addNavActive() {
-    let tagUpdateElement = document.getElementById("tag-update");
-    if (tagUpdateElement !== null) {
-        clearNavActive().then(function () {
-            if (tagUpdateElement.dataset.tag === undefined || tagUpdateElement.dataset.tag === "") {
-                return;
-            }
-            let tagElement = document.getElementById(tagUpdateElement.dataset.tag);
-            if (tagElement !== null) {
-                tagElement.classList.add("nav-item-active");
-            }
-        }).then(function () {
-            tagUpdateElement.remove();
-        });
-    }
-}
+import Alpine from './lib/alpine/alpine.esm.js'
+import morph from './lib/alpine/plugin/morph.esm.js'
 
 export function start() {
-    htmx.onLoad(function () {
-        formatToLocalTime();
-        addNavActive();
+    Alpine.store('csrf', {
+        token: '',
+        /** @param {string} token */
+        updateToken(token) {
+            if (this.token !== token) {
+                this.token = token;
+            }
+        },
+        /**
+         * @param {HTMLElement} element
+         * @param {boolean} remove
+         */
+        updateTokenByElement(element, remove = true) {
+            if (element.dataset.csrf) {
+                this.updateToken(element.dataset.csrf);
+            }
+            if (remove) {
+                element.remove();
+            }
+        },
+        /**
+         * @param {string} url
+         * @param {Object} options
+         * @returns {Promise<Response>}
+         */
+        fetch(url, options = {}) {
+            return fetch(url, {
+                ...options,
+                headers: {
+                    ...options.headers,
+                    'X-Csrf-Token': this.token
+                }
+            });
+        }
     });
 
     htmx.on("htmx:responseError", function (evt) {
@@ -76,4 +64,17 @@ export function start() {
             focusScroll: true
         });
     });
+
+    document.body.addEventListener("htmx:configRequest", function (evt) {
+        if (evt.detail.verb !== "get" && evt.detail.verb !== "head") {
+            evt.detail.headers["X-Csrf-Token"] = Alpine.store('csrf').token;
+        }
+    });
+
+    window.Alpine = Alpine;
+    window.htmx = htmx;
+
+    Alpine.plugin(morph);
+    
+    Alpine.start();
 }

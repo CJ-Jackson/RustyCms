@@ -30,7 +30,7 @@ pub fn positions_partial(
                         }
                     }
                     div .form-group mt-3 {
-                        button .btn .btn-sky-blue type="submit" { "Update Positions" }
+                        button .btn .btn-sky-blue .cursor-pointer type="submit" { "Update Positions" }
                     }
                 }
             }

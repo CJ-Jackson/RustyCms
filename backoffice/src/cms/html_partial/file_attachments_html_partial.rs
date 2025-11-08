@@ -26,7 +26,7 @@ pub fn file_attachments_list_partial(
                             div .label .mt-1 { "File Type:" }
                             (file.file_type.clone())
                             div .label .mt-1 { "Uploaded At:" }
-                            span x-init="await formatToLocalTime($el)" { (file.uploaded.to_rfc3339()) }
+                            span x-init="$store.util.formatToLocalTime($el)" { (file.uploaded.to_rfc3339()) }
 
                             div .text-right .mt-2 {
                                 a .file-attachment-delete .icon hx-delete=(update_fetch_query.as_uri()) hx-confirm="Are you sure?"
@@ -65,7 +65,7 @@ pub fn file_attachments_form_partial(update_fetch_query: &UpdateFetchQuery) -> M
                     }
                 }
 
-                button .btn .btn-sky-blue .mt-3 type="submit" { "Upload Files" }
+                button .btn .btn-sky-blue .cursor-pointer .mt-3 type="submit" { "Upload Files" }
             }
         }
     }
