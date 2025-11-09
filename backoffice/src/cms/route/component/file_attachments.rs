@@ -9,6 +9,7 @@ use crate::cms::service::cms_attachment_service::CmsAttachmentService;
 use crate::cms::service::cms_page_service::CmsPageService;
 use crate::cms::service::component_service::common_label_service::CommonLabelService;
 use crate::common::extractor::HeaderDeleteId;
+use crate::common::html::consts::SPLIT;
 use crate::common::html::partial::{command_list_partial, flash_partial};
 use maud::{Markup, html};
 use poem::i18n::Locale;
@@ -97,6 +98,7 @@ async fn file_attachments_component_update(
                 .map_err(poem::Error::from_error_stack)?;
             Ok(html! {
                 (form.as_form_html(&query, None))
+                (SPLIT)
                 span id=(format!{"component-position-label-{}", query.id}) hx-swap-oob="true"
                     { (validated.label.as_str()) }
                 (command_list_partial(vec![csrf_token.as_html_command()]))
@@ -107,6 +109,7 @@ async fn file_attachments_component_update(
             let message = verror.as_message(&locale);
             Ok(html! {
                 (form.as_form_html(&query, Some(message)))
+                (SPLIT)
                 (command_list_partial(vec![csrf_token.as_html_command()]))
             }
             .with_status(poem::http::StatusCode::UNPROCESSABLE_ENTITY)

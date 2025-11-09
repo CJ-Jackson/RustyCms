@@ -185,7 +185,7 @@ async fn cms_amend_page_get(
             div .flex .flex-row .mt-10 {
                 div class="basis-4/5 pr-6" {
                     h3 { "Components" }
-                    span { "All components are auto-save" }
+                    span { "All components are auto-save, with the exception of files" }
                     (component_partial(None, Arc::clone(&list_component_model)))
                     h3 .mt-5 { "Positions" }
                     (positions_partial(None, Arc::clone(&list_component_model), page_id))

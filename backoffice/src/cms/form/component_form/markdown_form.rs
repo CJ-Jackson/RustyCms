@@ -47,10 +47,11 @@ impl MarkdownForm {
         let errors = errors.unwrap_or_default();
 
         html! {
-            form .mb-3 .form hx-patch=(query.as_uri()) hx-target="this" hx-ext="alpine-morph" hx-swap="morph" hx-trigger="change" {
+            form .mb-3 .form x-data=(include_str!("_js/markdown_form_component.js")) data-uri=(query.as_uri()) {
                 div .form-group {
                     label .label for=(format!("label-group-label-{}", query.id)) { "Label" }
-                    input id=(format!("label-group-label-{}", query.id)) .form-item .w-full type="text" name="label" value=(self.label)
+                    input id=(format!("label-group-label-{}", query.id)) .form-item .w-full type="text" name="label"
+                        value=(self.label) data-value=(self.label) x-init="labelHandle($el)"
                         placeholder="Label" {}
                     span {
                         (errors.label.into_error_html())
@@ -59,7 +60,7 @@ impl MarkdownForm {
                 div .form-group {
                     label .label for=(format!("markdown-group-label-{}", query.id)) { "Markdown" }
                     span data-morph-ignore="true" {
-                        textarea x-data=(include_str!("_js/markdown_component.js")) x-model="value" data-value=(self.markdown)
+                        textarea data-value=(self.markdown) x-init="await markdownHandle($el)"
                             id=(format!("markdown-group-label-{}", query.id)) .form-item .w-full name="markdown" {
                             (self.markdown)
                         }

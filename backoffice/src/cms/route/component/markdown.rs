@@ -4,6 +4,7 @@ use crate::cms::methods::ComponentMethods;
 use crate::cms::query_model::{CreateQuery, UpdateFetchQuery};
 use crate::cms::service::cms_page_service::CmsPageService;
 use crate::cms::service::component_service::markdown_component_service::MarkdownComponentService;
+use crate::common::html::consts::SPLIT;
 use crate::common::html::partial::command_list_partial;
 use maud::{Markup, html};
 use poem::http::StatusCode;
@@ -79,6 +80,7 @@ async fn markdown_component_update(
                 .map_err(poem::Error::from_error_stack)?;
             Ok(html! {
                 (form.as_form_html(&query, None))
+                (SPLIT)
                 span id=(format!{"component-position-label-{}", query.id}) hx-swap-oob="true"
                     { (validated.label.as_str()) }
                 (command_list_partial(vec![csrf_token.as_html_command()]))
@@ -89,6 +91,7 @@ async fn markdown_component_update(
             let message = verror.as_message(&locale);
             Ok(html! {
                 (form.as_form_html(&query, Some(message)))
+                (SPLIT)
                 (command_list_partial(vec![csrf_token.as_html_command()]))
             }
             .with_status(StatusCode::UNPROCESSABLE_ENTITY)

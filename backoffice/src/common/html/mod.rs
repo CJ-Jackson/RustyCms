@@ -1,3 +1,4 @@
+pub mod consts;
 pub mod context_html;
 pub mod locale;
 pub mod partial;

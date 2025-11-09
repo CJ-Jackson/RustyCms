@@ -42,10 +42,11 @@ impl CommonLabelForm {
         let errors = errors.unwrap_or_default();
 
         html! {
-            form .mb-3 .form hx-patch=(query.as_uri()) hx-target="this" hx-ext="alpine-morph" hx-swap="morph" hx-trigger="change" {
+            form .mb-3 .form x-data=(include_str!("_js/common_label_form_component.js")) data-uri=(query.as_uri()) {
                 div .form-group id=(format!("label-group-{}", query.id)) {
                     label .label for=(format!("label-group-label-{}", query.id)) { "Label" }
                     input id=(format!("label-group-label-{}", query.id)) .form-item .w-full type="text" name="label" value=(self.label)
+                        data-value=(self.label) x-init="labelHandle($el)"
                         placeholder="Label" {}
                     span {
                         (errors.label.into_error_html())
